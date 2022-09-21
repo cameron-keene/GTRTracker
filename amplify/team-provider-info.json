@@ -1,0 +1,15 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-gtrtracker-staging-05406-authRole",
+      "UnauthRoleArn": "arn:aws:iam::166144892231:role/amplify-gtrtracker-staging-05406-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::166144892231:role/amplify-gtrtracker-staging-05406-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-gtrtracker-staging-05406-deployment",
+      "UnauthRoleName": "amplify-gtrtracker-staging-05406-unauthRole",
+      "StackName": "amplify-gtrtracker-staging-05406",
+      "StackId": "arn:aws:cloudformation:us-east-1:166144892231:stack/amplify-gtrtracker-staging-05406/e56b0210-3947-11ed-8e16-0a89861df627",
+      "AmplifyAppId": "d2rf8q7vcxa2vb"
+    }
+  }
+}
