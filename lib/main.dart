@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 // amplify packages we will need to use
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
+import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 
 // amplify configuration and models that should have been generated for you
 import 'amplifyconfiguration.dart';
@@ -39,6 +41,7 @@ class TodosPage extends StatefulWidget {
 class _TodosPageState extends State<TodosPage> {
   // subscription of Todo QuerySnapshots - to be initialized at runtime
   late StreamSubscription<QuerySnapshot<Todo>> _subscription;
+
   // loading ui state - initially set to a loading state
   bool _isLoading = true;
 
@@ -48,7 +51,8 @@ class _TodosPageState extends State<TodosPage> {
   // amplify plugins
   final _dataStorePlugin =
       AmplifyDataStore(modelProvider: ModelProvider.instance);
-
+  final AmplifyAPI _apiPlugin = AmplifyAPI();
+  // final AmplifyAuthCognito _authPlugin = AmplifyAuthCognito();
   @override
   void initState() {
     // kick off app initialization
@@ -84,18 +88,14 @@ class _TodosPageState extends State<TodosPage> {
   }
 
   Future<void> _configureAmplify() async {
+    await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
     try {
-      // add Amplify plugins
-      await Amplify.addPlugins([_dataStorePlugin]);
-
-      // configure Amplify
-      //
-      // note that Amplify cannot be configured more than once!
       await Amplify.configure(amplifyconfig);
-    } catch (e) {
-      // error handling can be improved for sure!
-      // but this will be sufficient for the purposes of this tutorial
-      print('An error occurred while configuring Amplify: $e');
+    } on AmplifyAlreadyConfiguredException {
+      print(
+          "Tried to reconfigure Amplify; this can occur when your app restarts on Android.");
+    } on AmplifyException catch (e) {
+      throw AmplifyException(e.message);
     }
   }
 
@@ -169,7 +169,7 @@ class TodoItem extends StatelessWidget {
     // copy the Todo we wish to update, but with updated properties
     final updatedTodo = todo.copyWith(isComplete: !todo.isComplete);
     try {
-      // to update data in DataStore, we again pass an instance of a modelR to
+      // to update data in DataStore, we again pass an instance of a model to
       // Amplify.DataStore.save()
       await Amplify.DataStore.save(updatedTodo);
     } catch (e) {
