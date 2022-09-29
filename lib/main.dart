@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Amplified Todo',
-      home: TodosPage(),
+      home: HomePage(),
     );
   }
 }
@@ -88,7 +88,12 @@ class _TodosPageState extends State<TodosPage> {
   }
 
   Future<void> _configureAmplify() async {
-    await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
+    if (Amplify.isConfigured){
+      null;
+    }
+    else{
+      await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
+    }
     try {
       await Amplify.configure(amplifyconfig);
     } on AmplifyAlreadyConfiguredException {
@@ -122,6 +127,161 @@ class _TodosPageState extends State<TodosPage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+}
+
+class Page1 extends StatelessWidget {
+  const Page1({Key? key}) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Color.fromARGB(255, 27, 27, 27),
+      child: const Center(
+        child: Text(
+          "Dashboard",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 45,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Page2 extends StatelessWidget {
+  const Page2({Key? key}) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Color.fromARGB(255, 27, 27, 27),
+      child: const Center(
+        child: Text(
+          "Analysis",
+          style: TextStyle(
+            color: Color.fromARGB(255, 255, 255, 255),
+            fontSize: 45,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+  
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+  
+class _HomePageState extends State<HomePage> {
+  int pageIndex = 0;
+  
+  final pages = [
+    const Page1(),
+    const TodosPage(),
+    const Page2()
+  ];
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xffC4DFCB),
+      appBar: AppBar(
+        title: Text(
+          "GTRTracker",
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontSize: 25,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+      ),
+      body: pages[pageIndex],
+      bottomNavigationBar: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 27, 27, 27),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 12,
+              spreadRadius: 2,
+              offset: const Offset(2, -2),
+            ),
+          ]
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              enableFeedback: false,
+              onPressed: () {
+                setState(() {
+                  pageIndex = 0;
+                });
+              },
+              icon: pageIndex == 0
+                  ? const Icon(
+                      Icons.home_filled,
+                      color: Color.fromARGB(255, 43, 121, 194),
+                      size: 35,
+                    )
+                  : const Icon(
+                      Icons.home_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+            ),
+            IconButton(
+              enableFeedback: false,
+              onPressed: () {
+                setState(() {
+                  pageIndex = 1;
+                });
+              },
+              icon: pageIndex == 1
+                  ? const Icon(
+                      Icons.task_alt_rounded,
+                      color: Color.fromARGB(255, 43, 121, 194),
+                      size: 35,
+                    )
+                  : const Icon(
+                      Icons.task_alt_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+            ),
+            IconButton(
+              enableFeedback: false,
+              onPressed: () {
+                setState(() {
+                  pageIndex = 2;
+                });
+              },
+              icon: pageIndex == 2
+                  ? const Icon(
+                      Icons.timeline_rounded,
+                      color: Color.fromARGB(255, 43, 121, 194),
+                      size: 35,
+                    )
+                  : const Icon(
+                      Icons.timeline_outlined,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
