@@ -9,6 +9,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // amplify configuration and models that should have been generated for you
 import 'amplifyconfiguration.dart';
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Amplified Todo',
-      home: HomePage(),
+      home: NavBar(),
     );
   }
 }
@@ -80,11 +81,11 @@ class _TodosPageState extends State<TodosPage> {
     // _todos is set to the value in the latest snapshot
     _subscription = Amplify.DataStore.observeQuery(Todo.classType)
         .listen((QuerySnapshot<Todo> snapshot) {
-      setState(() {
+      if (mounted) { setState(() {
         if (_isLoading) _isLoading = false;
         _todos = snapshot.items;
       });
-    });
+    }});
   }
 
   Future<void> _configureAmplify() async {
@@ -108,8 +109,10 @@ class _TodosPageState extends State<TodosPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Todo List'),
+        backgroundColor: Color.fromARGB(255, 27, 27, 27),
+        title: const Text('My Todo List', style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
       ),
+      backgroundColor: Color.fromARGB(255, 27, 27, 27),
       // body: const Center(child: CircularProgressIndicator()),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
@@ -131,80 +134,258 @@ class _TodosPageState extends State<TodosPage> {
   }
 }
 
-class Page1 extends StatelessWidget {
-  const Page1({Key? key}) : super(key: key);
-  
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Color.fromARGB(255, 27, 27, 27),
-      child: const Center(
-        child: Text(
-          "Dashboard",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 45,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class Page2 extends StatelessWidget {
-  const Page2({Key? key}) : super(key: key);
-  
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Color.fromARGB(255, 27, 27, 27),
-      child: const Center(
-        child: Text(
-          "Analysis",
-          style: TextStyle(
-            color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 45,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
-  
+
   @override
   _HomePageState createState() => _HomePageState();
 }
-  
+
 class _HomePageState extends State<HomePage> {
+  
+  @override
+  final _dataStorePlugin =
+    AmplifyDataStore(modelProvider: ModelProvider.instance);
+  final AmplifyAPI _apiPlugin = AmplifyAPI();
+  void initState() {
+  // kick off app initialization
+  readFromDatabase();
+
+  super.initState();
+  }
+
+  late StreamSubscription<QuerySnapshot<Todo>> _subscription;
+  bool _isLoading = true;
+  List<Todo> _todos = [];
+
+  Future<void> readFromDatabase() async {
+    if (Amplify.isConfigured){
+      null;
+    }
+    else{
+      await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
+    }
+    try {
+      await Amplify.configure(amplifyconfig);
+    } on AmplifyAlreadyConfiguredException {
+      print(
+          "Tried to reconfigure Amplify; this can occur when your app restarts on Android.");
+    } on AmplifyException catch (e) {
+      throw AmplifyException(e.message);
+    }
+    _subscription = Amplify.DataStore.observeQuery(Todo.classType)
+        .listen((QuerySnapshot<Todo> snapshot) {
+        if (mounted) { 
+          setState(() {
+            if (_isLoading) _isLoading = false;
+            _todos = snapshot.items;
+          });
+    }});
+}
+
+  @override
+  Widget build(BuildContext context) {
+    final border = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15.0),
+    );
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 27, 27, 27),
+        title: Text("Home", style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+      ),
+      backgroundColor: Color.fromARGB(255, 27, 27, 27),
+      
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView( child: Column(
+        children: <Widget> [
+      Center(child:Container(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+        child: Align(
+          alignment: Alignment.center,
+          child:Text('Current Goals',
+            style: GoogleFonts.roboto(
+            color: Color.fromARGB(255, 255, 255, 255),
+            fontSize: 25,
+            fontWeight: FontWeight.bold),)))),
+    
+      const Padding(padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+        child: Align(
+        alignment: Alignment.centerLeft,)),
+          ListTileTheme(
+          contentPadding: const EdgeInsets.all(8),
+          iconColor: Color.fromARGB(255, 0, 0, 0),
+          textColor: Color.fromARGB(255, 0, 0, 0),
+          tileColor: Color.fromARGB(255, 255, 255, 255),
+          style: ListTileStyle.list,
+          dense: true,
+          child: 
+          ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(8.0),
+            itemCount: _todos.length,
+            itemBuilder: (context, index) {
+            return Card(
+              child: ListTile(
+                shape: border,
+              trailing: Icon(Icons.more_vert),
+              title: Text(_todos[index].name, textScaleFactor: 1.5, style: GoogleFonts.roboto(fontSize: 13,fontWeight: FontWeight.w500), ),
+
+              onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailScreen(goal: _todos[index]),
+                ),
+              );
+            },
+          ));
+        },
+      ),
+    )
+    ])));
+  }
+}
+
+
+
+class AnalysisPage extends StatelessWidget {
+  const AnalysisPage({Key? key}) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 27, 27, 27),
+        title: Text("Analysis", style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+      ),
+      backgroundColor: Color.fromARGB(255, 27, 27, 27),
+      body: Column(
+        children: <Widget> [
+      
+      Center(child:Container(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child:Text('Goal Progress Map',
+            style: GoogleFonts.roboto(
+            color: Color.fromARGB(255, 255, 255, 255),
+            fontSize: 25,
+            fontWeight: FontWeight.bold),)))),
+    
+      Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+        child: Align(
+          alignment: Alignment.centerLeft,)),
+  
+      Divider(color: Color.fromARGB(255, 255, 255, 255)),
+        ],
+    ));
+  }
+}
+
+class DetailScreen extends StatelessWidget {
+  // In the constructor, require a Goal.
+  const DetailScreen({super.key, required this.goal});
+
+  // Declare a field that holds the Goal.
+  final Todo goal;
+
+  @override
+  Widget build(BuildContext context) {
+    // Use the Goal to create the UI.
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 27, 27, 27),
+        title: Text(goal.name, style: TextStyle(color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
+      ),
+      backgroundColor: Color.fromARGB(255, 27, 27, 27),
+      
+      body: Column(
+        children: <Widget> [
+      
+      Center(child:Container(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child:Text('Goal Description',
+            style: GoogleFonts.roboto(
+            color: Color.fromARGB(255, 43, 121, 194),
+            fontSize: 25,
+            fontWeight: FontWeight.bold),)))),
+      
+      //goal description
+      Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child:Text(goal.description ?? "",
+            textAlign: TextAlign.left,
+            style: GoogleFonts.roboto(color: Color.fromARGB(255, 255, 255, 255),
+            fontSize: 20,),))),
+  
+      Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+      Center(child:Container(
+        padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child:Text('Goal Progress',
+            style: GoogleFonts.roboto(
+            color: Color.fromARGB(255, 43, 121, 194),
+            fontSize: 25,
+            fontWeight: FontWeight.bold),)))),
+      
+      //progress bar
+      Center(child:Container(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+        color: Color.fromARGB(255, 150, 155, 159),
+        child:
+          LinearProgressIndicator(
+            minHeight: 7,
+            backgroundColor: Color.fromARGB(255, 255, 255, 255),
+            valueColor: new AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 43, 121, 194)),
+            value: 0.4, ),)), //update with current hours towards goal
+      Divider(color: Color.fromARGB(255, 255, 255, 255)),
+      
+      Center(child:Container(
+        padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child:Text('Goal Location',
+            style: GoogleFonts.roboto(
+            color: Color.fromARGB(255, 43, 121, 194),
+            fontSize: 25,
+            fontWeight: FontWeight.bold),)))),
+
+        ],
+      ),
+    )
+    ;
+  }
+}
+
+class NavBar extends StatefulWidget {
+  const NavBar({Key? key}) : super(key: key);
+  
+  @override
+  _NavBarState createState() => _NavBarState();
+}
+  
+class _NavBarState extends State<NavBar> {
   int pageIndex = 0;
   
+  //array to connect pages to navbar
   final pages = [
-    const Page1(),
+    const HomePage(),
     const TodosPage(),
-    const Page2()
+    const AnalysisPage()
   ];
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //styling
       backgroundColor: const Color(0xffC4DFCB),
-      appBar: AppBar(
-        title: Text(
-          "GTRTracker",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontSize: 25,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-      ),
       body: pages[pageIndex],
       bottomNavigationBar: Container(
         height: 60,
@@ -229,6 +410,7 @@ class _HomePageState extends State<HomePage> {
                   pageIndex = 0;
                 });
               },
+              //home page
               icon: pageIndex == 0
                   ? const Icon(
                       Icons.home_filled,
@@ -248,6 +430,7 @@ class _HomePageState extends State<HomePage> {
                   pageIndex = 1;
                 });
               },
+              //goal page
               icon: pageIndex == 1
                   ? const Icon(
                       Icons.task_alt_rounded,
@@ -267,6 +450,7 @@ class _HomePageState extends State<HomePage> {
                   pageIndex = 2;
                 });
               },
+              //analysis page
               icon: pageIndex == 2
                   ? const Icon(
                       Icons.timeline_rounded,
@@ -296,6 +480,7 @@ class TodosList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return todos.isNotEmpty
         ? ListView(
             padding: const EdgeInsets.all(8),
@@ -417,6 +602,7 @@ class _AddTodoFormState extends State<AddTodoForm> {
       appBar: AppBar(
         title: const Text('Add Todo'),
       ),
+      backgroundColor: Color.fromARGB(255, 27, 27, 27),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
@@ -426,12 +612,12 @@ class _AddTodoFormState extends State<AddTodoForm> {
               TextFormField(
                 controller: _nameController,
                 decoration:
-                    const InputDecoration(filled: true, labelText: 'Name'),
+                    const InputDecoration(filled: true, labelText: 'Name', labelStyle: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
               ),
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
-                    filled: true, labelText: 'Description'),
+                    filled: true, labelText: 'Description', labelStyle: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
               ),
               ElevatedButton(
                 onPressed: _saveTodo,
