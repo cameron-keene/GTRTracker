@@ -22,6 +22,8 @@ import 'package:easy_geofencing/enums/geofence_status.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'package:geocoding/geocoding.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -305,6 +307,7 @@ class detailScreen extends StatefulWidget {
   TextEditingController latitudeController = new TextEditingController();
   TextEditingController longitudeController = new TextEditingController();
   TextEditingController radiusController = new TextEditingController();
+  TextEditingController locationController = new TextEditingController();
   StreamSubscription<GeofenceStatus>? geofenceStatusStream;
   Geolocator geolocator = Geolocator();
   String geofenceStatus = '';
@@ -414,26 +417,26 @@ class _detailScreenState extends State<detailScreen> {
                             fontSize: 25,
                             fontWeight: FontWeight.bold),
                       )))),
-          ElevatedButton(
-            child: Text("Add region"),
-            onPressed: () {
-              debugPrint("geofence trigger");
-              setLocation();
-              // Geolocation location = Geolocation(
-              //     latitude: 50.853410,
-              //     longitude: 3.354470,
-              //     radius: 50.0,
-              //     id: "Kerkplein13");
-              // Geofence.addGeolocation(location, GeolocationEvent.entry)
-              //     .then((onValue) {
-              //   print("great success");
-              //   scheduleNotification(
-              //       "Georegion added", "Your geofence has been added!");
-              // }).catchError((onError) {
-              //   print("great failure");
-              // });
+          TextField(
+            controller: widget.locationController,
+            onSubmitted: (String value) async {
+              List<Location> locations = await locationFromAddress(value);
+              String latitude = locations.elementAt(0).latitude.toString();
+              String longitude = locations.elementAt(0).longitude.toString();
+              print("latitude: $latitude, longitude: $longitude");
+              print("starting geoFencing Service");
             },
           ),
+          ElevatedButton(
+              child: Text("geoCoding feature"),
+              onPressed: () async {
+                List<Location> locations =
+                    await locationFromAddress(widget.locationController.text);
+                String latitude = locations.elementAt(0).latitude.toString();
+                String longitude = locations.elementAt(0).longitude.toString();
+                print("latitude: $latitude, longitude: $longitude");
+                print("starting geoFencing Service");
+              }),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -470,14 +473,6 @@ class _detailScreenState extends State<detailScreen> {
                 },
               ),
             ],
-          ),
-          SizedBox(
-            height: 100,
-          ),
-          Text(
-            "Geofence Status: \n\n\n" + widget.geofenceStatus,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
           ),
         ],
       ),
