@@ -81,18 +81,19 @@ class _TodosPageState extends State<TodosPage> {
     // _todos is set to the value in the latest snapshot
     _subscription = Amplify.DataStore.observeQuery(Todo.classType)
         .listen((QuerySnapshot<Todo> snapshot) {
-      if (mounted) { setState(() {
-        if (_isLoading) _isLoading = false;
-        _todos = snapshot.items;
-      });
-    }});
+      if (mounted) {
+        setState(() {
+          if (_isLoading) _isLoading = false;
+          _todos = snapshot.items;
+        });
+      }
+    });
   }
 
   Future<void> _configureAmplify() async {
-    if (Amplify.isConfigured){
+    if (Amplify.isConfigured) {
       null;
-    }
-    else{
+    } else {
       await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
     }
     try {
@@ -110,7 +111,8 @@ class _TodosPageState extends State<TodosPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: const Text('My Todo List', style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+        title: const Text('My Todo List',
+            style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
       // body: const Center(child: CircularProgressIndicator()),
@@ -142,16 +144,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
   @override
   final _dataStorePlugin =
-    AmplifyDataStore(modelProvider: ModelProvider.instance);
+      AmplifyDataStore(modelProvider: ModelProvider.instance);
   final AmplifyAPI _apiPlugin = AmplifyAPI();
   void initState() {
-  // kick off app initialization
-  readFromDatabase();
+    // kick off app initialization
+    readFromDatabase();
 
-  super.initState();
+    super.initState();
   }
 
   late StreamSubscription<QuerySnapshot<Todo>> _subscription;
@@ -159,10 +160,9 @@ class _HomePageState extends State<HomePage> {
   List<Todo> _todos = [];
 
   Future<void> readFromDatabase() async {
-    if (Amplify.isConfigured){
+    if (Amplify.isConfigured) {
       null;
-    }
-    else{
+    } else {
       await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
     }
     try {
@@ -175,13 +175,14 @@ class _HomePageState extends State<HomePage> {
     }
     _subscription = Amplify.DataStore.observeQuery(Todo.classType)
         .listen((QuerySnapshot<Todo> snapshot) {
-        if (mounted) { 
-          setState(() {
-            if (_isLoading) _isLoading = false;
-            _todos = snapshot.items;
-          });
-    }});
-}
+      if (mounted) {
+        setState(() {
+          if (_isLoading) _isLoading = false;
+          _todos = snapshot.items;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -189,98 +190,107 @@ class _HomePageState extends State<HomePage> {
       borderRadius: BorderRadius.circular(15.0),
     );
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 27, 27, 27),
+          title: Text("Home",
+              style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+        ),
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text("Home", style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
-      ),
-      backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView( child: Column(
-        children: <Widget> [
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-        child: Align(
-          alignment: Alignment.center,
-          child:Text('Current Goals',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
-    
-      const Padding(padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-        child: Align(
-        alignment: Alignment.centerLeft,)),
-          ListTileTheme(
-          contentPadding: const EdgeInsets.all(8),
-          iconColor: Color.fromARGB(255, 0, 0, 0),
-          textColor: Color.fromARGB(255, 0, 0, 0),
-          tileColor: Color.fromARGB(255, 255, 255, 255),
-          style: ListTileStyle.list,
-          dense: true,
-          child: 
-          ListView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(8.0),
-            itemCount: _todos.length,
-            itemBuilder: (context, index) {
-            return Card(
-              child: ListTile(
-                shape: border,
-              trailing: Icon(Icons.more_vert),
-              title: Text(_todos[index].name, textScaleFactor: 1.5, style: GoogleFonts.roboto(fontSize: 13,fontWeight: FontWeight.w500), ),
-
-              onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DetailScreen(goal: _todos[index]),
-                ),
-              );
-            },
-          ));
-        },
-      ),
-    )
-    ])));
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(children: <Widget>[
+                Center(
+                    child: Container(
+                        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Current Goals',
+                              style: GoogleFonts.roboto(
+                                  color: Color.fromARGB(255, 255, 255, 255),
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            )))),
+                const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                    )),
+                ListTileTheme(
+                  contentPadding: const EdgeInsets.all(8),
+                  iconColor: Color.fromARGB(255, 0, 0, 0),
+                  textColor: Color.fromARGB(255, 0, 0, 0),
+                  tileColor: Color.fromARGB(255, 255, 255, 255),
+                  style: ListTileStyle.list,
+                  dense: true,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(8.0),
+                    itemCount: _todos.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                          child: ListTile(
+                        shape: border,
+                        trailing: Icon(Icons.more_vert),
+                        title: Text(
+                          _todos[index].name,
+                          textScaleFactor: 1.5,
+                          style: GoogleFonts.roboto(
+                              fontSize: 13, fontWeight: FontWeight.w500),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailScreen(goal: _todos[index]),
+                            ),
+                          );
+                        },
+                      ));
+                    },
+                  ),
+                )
+              ])));
   }
 }
 
-
-
 class AnalysisPage extends StatelessWidget {
   const AnalysisPage({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 27, 27, 27),
+          title: Text("Analysis",
+              style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+        ),
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text("Analysis", style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
-      ),
-      backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      body: Column(
-        children: <Widget> [
-      
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text('Goal Progress Map',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
-    
-      Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-        child: Align(
-          alignment: Alignment.centerLeft,)),
-  
-      Divider(color: Color.fromARGB(255, 255, 255, 255)),
-        ],
-    ));
+        body: Column(
+          children: <Widget>[
+            Center(
+                child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Goal Progress Map',
+                          style: GoogleFonts.roboto(
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )))),
+            Padding(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                )),
+            Divider(color: Color.fromARGB(255, 255, 255, 255)),
+          ],
+        ));
   }
 }
 
@@ -297,90 +307,120 @@ class DetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text(goal.name, style: TextStyle(color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
+        title: Text(goal.name,
+            style: TextStyle(
+                color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      
       body: Column(
-        children: <Widget> [
-      
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text('Goal Description',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 43, 121, 194),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
-      
-      //goal description
-      Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text(goal.description ?? "",
-            textAlign: TextAlign.left,
-            style: GoogleFonts.roboto(color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 20,),))),
-  
-      Divider(color: Color.fromARGB(255, 255, 255, 255)),
+        children: <Widget>[
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Description',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
 
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text('Goal Progress',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 43, 121, 194),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
-      
-      //progress bar
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-        color: Color.fromARGB(255, 150, 155, 159),
-        child:
-          LinearProgressIndicator(
-            minHeight: 7,
-            backgroundColor: Color.fromARGB(255, 255, 255, 255),
-            valueColor: new AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 43, 121, 194)),
-            value: 0.4, ),)), //update with current hours towards goal
-      Divider(color: Color.fromARGB(255, 255, 255, 255)),
-      
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text('Goal Location',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 43, 121, 194),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
+          //goal description
+          Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    goal.description ?? "",
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.roboto(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 20,
+                    ),
+                  ))),
 
+          Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Progress',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
+
+          //progress bar
+          Center(
+              child: Container(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+            color: Color.fromARGB(255, 150, 155, 159),
+            child: LinearProgressIndicator(
+              minHeight: 7,
+              backgroundColor: Color.fromARGB(255, 255, 255, 255),
+              valueColor: new AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 43, 121, 194)),
+              value: 0.4,
+            ),
+          )), //update with current hours towards goal
+          Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Location',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
+          ElevatedButton(
+            child: Text("Add region"),
+            onPressed: () {
+              debugPrint("geofence trigger");
+              // Geolocation location = Geolocation(
+              //     latitude: 50.853410,
+              //     longitude: 3.354470,
+              //     radius: 50.0,
+              //     id: "Kerkplein13");
+              // Geofence.addGeolocation(location, GeolocationEvent.entry)
+              //     .then((onValue) {
+              //   print("great success");
+              //   scheduleNotification(
+              //       "Georegion added", "Your geofence has been added!");
+              // }).catchError((onError) {
+              //   print("great failure");
+              // });
+            },
+          ),
         ],
       ),
-    )
-    ;
+    );
   }
 }
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
-  
+
   @override
   _NavBarState createState() => _NavBarState();
 }
-  
+
 class _NavBarState extends State<NavBar> {
   int pageIndex = 0;
-  
+
   //array to connect pages to navbar
-  final pages = [
-    const HomePage(),
-    const TodosPage(),
-    const AnalysisPage()
-  ];
-  
+  final pages = [const HomePage(), const TodosPage(), const AnalysisPage()];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -389,17 +429,15 @@ class _NavBarState extends State<NavBar> {
       body: pages[pageIndex],
       bottomNavigationBar: Container(
         height: 60,
-        decoration: BoxDecoration(
-          color: Color.fromARGB(255, 27, 27, 27),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 12,
-              spreadRadius: 2,
-              offset: const Offset(2, -2),
-            ),
-          ]
-        ),
+        decoration:
+            BoxDecoration(color: Color.fromARGB(255, 27, 27, 27), boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 12,
+            spreadRadius: 2,
+            offset: const Offset(2, -2),
+          ),
+        ]),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -480,7 +518,6 @@ class TodosList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return todos.isNotEmpty
         ? ListView(
             padding: const EdgeInsets.all(8),
@@ -611,13 +648,19 @@ class _AddTodoFormState extends State<AddTodoForm> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration:
-                    const InputDecoration(filled: true, labelText: 'Name', labelStyle: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+                decoration: const InputDecoration(
+                    filled: true,
+                    labelText: 'Name',
+                    labelStyle:
+                        TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
               ),
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
-                    filled: true, labelText: 'Description', labelStyle: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+                    filled: true,
+                    labelText: 'Description',
+                    labelStyle:
+                        TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
               ),
               ElevatedButton(
                 onPressed: _saveTodo,
