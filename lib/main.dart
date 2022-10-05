@@ -16,6 +16,12 @@ import 'amplifyconfiguration.dart';
 import 'models/ModelProvider.dart';
 import 'models/Todo.dart';
 
+// easy_geofence
+import 'package:easy_geofencing/easy_geofencing.dart';
+import 'package:easy_geofencing/enums/geofence_status.dart';
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -151,7 +157,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // kick off app initialization
     readFromDatabase();
-
     super.initState();
   }
 
@@ -245,7 +250,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  DetailScreen(goal: _todos[index]),
+                                  detailScreen(goal: _todos[index]),
                             ),
                           );
                         },
@@ -294,12 +299,38 @@ class AnalysisPage extends StatelessWidget {
   }
 }
 
-class DetailScreen extends StatelessWidget {
-  // In the constructor, require a Goal.
-  const DetailScreen({super.key, required this.goal});
-
-  // Declare a field that holds the Goal.
+class detailScreen extends StatefulWidget {
+  detailScreen({Key? key, required this.goal}) : super(key: key);
   final Todo goal;
+  TextEditingController latitudeController = new TextEditingController();
+  TextEditingController longitudeController = new TextEditingController();
+  TextEditingController radiusController = new TextEditingController();
+  StreamSubscription<GeofenceStatus>? geofenceStatusStream;
+  Geolocator geolocator = Geolocator();
+  String geofenceStatus = '';
+  bool isReady = false;
+  Position? position;
+
+  @override
+  State<detailScreen> createState() => _detailScreenState();
+}
+
+class _detailScreenState extends State<detailScreen> {
+  getCurrentPosition() async {
+    widget.position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    print("LOCATION => ${widget.position!.toJson()}");
+    widget.isReady = (widget.position != null) ? true : false;
+  }
+
+  setLocation() async {
+    await getCurrentPosition();
+    print("POSITION => ${widget.position!.toJson()}");
+    widget.latitudeController =
+        TextEditingController(text: widget.position!.latitude.toString());
+    widget.longitudeController =
+        TextEditingController(text: widget.position!.longitude.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +338,7 @@ class DetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text(goal.name,
+        title: Text(widget.goal.name,
             style: TextStyle(
                 color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
       ),
@@ -333,7 +364,7 @@ class DetailScreen extends StatelessWidget {
               child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    goal.description ?? "",
+                    widget.goal.description ?? "",
                     textAlign: TextAlign.left,
                     style: GoogleFonts.roboto(
                       color: Color.fromARGB(255, 255, 255, 255),
@@ -387,6 +418,7 @@ class DetailScreen extends StatelessWidget {
             child: Text("Add region"),
             onPressed: () {
               debugPrint("geofence trigger");
+              setLocation();
               // Geolocation location = Geolocation(
               //     latitude: 50.853410,
               //     longitude: 3.354470,
@@ -402,11 +434,170 @@ class DetailScreen extends StatelessWidget {
               // });
             },
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                child: Text("Start"),
+                onPressed: () {
+                  print("starting geoFencing Service");
+                  EasyGeofencing.startGeofenceService(
+                      pointedLatitude: widget.latitudeController.text,
+                      pointedLongitude: widget.longitudeController.text,
+                      radiusMeter: widget.radiusController.text,
+                      eventPeriodInSeconds: 5);
+                  if (widget.geofenceStatusStream == null) {
+                    widget.geofenceStatusStream =
+                        EasyGeofencing.getGeofenceStream()!
+                            .listen((GeofenceStatus status) {
+                      print(status.toString());
+                      setState(() {
+                        widget.geofenceStatus = status.toString();
+                      });
+                    });
+                  }
+                },
+              ),
+              SizedBox(
+                width: 10.0,
+              ),
+              ElevatedButton(
+                child: Text("Stop"),
+                onPressed: () {
+                  print("stop");
+                  EasyGeofencing.stopGeofenceService();
+                  widget.geofenceStatusStream!.cancel();
+                },
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 100,
+          ),
+          Text(
+            "Geofence Status: \n\n\n" + widget.geofenceStatus,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
   }
 }
+
+// class DetailScreen extends StatelessWidget {
+//   // In the constructor, require a Goal.
+//   const DetailScreen({super.key, required this.goal});
+
+//   // Declare a field that holds the Goal.
+//   final Todo goal;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     // Use the Goal to create the UI.
+//     return Scaffold(
+//       appBar: AppBar(
+//         backgroundColor: Color.fromARGB(255, 27, 27, 27),
+//         title: Text(goal.name,
+//             style: TextStyle(
+//                 color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
+//       ),
+//       backgroundColor: Color.fromARGB(255, 27, 27, 27),
+//       body: Column(
+//         children: <Widget>[
+//           Center(
+//               child: Container(
+//                   padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+//                   child: Align(
+//                       alignment: Alignment.centerLeft,
+//                       child: Text(
+//                         'Goal Description',
+//                         style: GoogleFonts.roboto(
+//                             color: Color.fromARGB(255, 43, 121, 194),
+//                             fontSize: 25,
+//                             fontWeight: FontWeight.bold),
+//                       )))),
+
+//           //goal description
+//           Padding(
+//               padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+//               child: Align(
+//                   alignment: Alignment.centerLeft,
+//                   child: Text(
+//                     goal.description ?? "",
+//                     textAlign: TextAlign.left,
+//                     style: GoogleFonts.roboto(
+//                       color: Color.fromARGB(255, 255, 255, 255),
+//                       fontSize: 20,
+//                     ),
+//                   ))),
+
+//           Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+//           Center(
+//               child: Container(
+//                   padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+//                   child: Align(
+//                       alignment: Alignment.centerLeft,
+//                       child: Text(
+//                         'Goal Progress',
+//                         style: GoogleFonts.roboto(
+//                             color: Color.fromARGB(255, 43, 121, 194),
+//                             fontSize: 25,
+//                             fontWeight: FontWeight.bold),
+//                       )))),
+
+//           //progress bar
+//           Center(
+//               child: Container(
+//             padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+//             color: Color.fromARGB(255, 150, 155, 159),
+//             child: LinearProgressIndicator(
+//               minHeight: 7,
+//               backgroundColor: Color.fromARGB(255, 255, 255, 255),
+//               valueColor: new AlwaysStoppedAnimation<Color>(
+//                   Color.fromARGB(255, 43, 121, 194)),
+//               value: 0.4,
+//             ),
+//           )), //update with current hours towards goal
+//           Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+//           Center(
+//               child: Container(
+//                   padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
+//                   child: Align(
+//                       alignment: Alignment.centerLeft,
+//                       child: Text(
+//                         'Goal Location',
+//                         style: GoogleFonts.roboto(
+//                             color: Color.fromARGB(255, 43, 121, 194),
+//                             fontSize: 25,
+//                             fontWeight: FontWeight.bold),
+//                       )))),
+//           ElevatedButton(
+//             child: Text("Add region"),
+//             onPressed: () {
+//               debugPrint("geofence trigger");
+//               // Geolocation location = Geolocation(
+//               //     latitude: 50.853410,
+//               //     longitude: 3.354470,
+//               //     radius: 50.0,
+//               //     id: "Kerkplein13");
+//               // Geofence.addGeolocation(location, GeolocationEvent.entry)
+//               //     .then((onValue) {
+//               //   print("great success");
+//               //   scheduleNotification(
+//               //       "Georegion added", "Your geofence has been added!");
+//               // }).catchError((onError) {
+//               //   print("great failure");
+//               // });
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
