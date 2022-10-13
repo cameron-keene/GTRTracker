@@ -1,5 +1,6 @@
 // dart async library we will refer to when setting up real time updates
 import 'dart:async';
+import 'dart:collection';
 
 // flutter and ui libraries
 import 'package:flutter/material.dart';
@@ -9,7 +10,9 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // amplify configuration and models that should have been generated for you
 import 'amplifyconfiguration.dart';
@@ -71,6 +74,7 @@ class _TodosPageState extends State<TodosPage> {
   Future<void> _initializeApp() async {
     // configure Amplify
     await _configureAmplify();
+    await requestPermission();
 
     // Query and Observe updates to Todo models. DataStore.observeQuery() will
     // emit an initial QuerySnapshot with a list of Todo models in the local store,
@@ -87,6 +91,8 @@ class _TodosPageState extends State<TodosPage> {
       });
     }});
   }
+
+  Future<void> requestPermission() async { await Permission.location.request(); }
 
   Future<void> _configureAmplify() async {
     if (Amplify.isConfigured){
@@ -110,7 +116,7 @@ class _TodosPageState extends State<TodosPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: const Text('My Todo List', style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+        title: const Text('Goals', style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
       // body: const Center(child: CircularProgressIndicator()),
@@ -124,9 +130,9 @@ class _TodosPageState extends State<TodosPage> {
             MaterialPageRoute(builder: (context) => const AddTodoForm()),
           );
         },
-        tooltip: 'Add Todo',
+        tooltip: 'Add Goal',
         label: Row(
-          children: const [Icon(Icons.add), Text('Add todo')],
+          children: const [Icon(Icons.add), Text('Add Goal')],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -223,6 +229,7 @@ class _HomePageState extends State<HomePage> {
           ListView.builder(
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.all(8.0),
             itemCount: _todos.length,
             itemBuilder: (context, index) {
@@ -250,58 +257,130 @@ class _HomePageState extends State<HomePage> {
 
 
 
-class AnalysisPage extends StatelessWidget {
+class AnalysisPage extends StatefulWidget {
   const AnalysisPage({Key? key}) : super(key: key);
+  
+  @override
+  State<AnalysisPage> createState() => _AnalysisPageState();  
+}
+
+class _AnalysisPageState extends State<AnalysisPage> {
+  late GoogleMapController mapController;
+
+  final LatLng _center = const LatLng(29.648198545235758, -82.34372474439299);
+  
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 27, 27, 27),
+          title: Text("Analysis",
+              style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+        ),
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text("Analysis", style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+        body: SingleChildScrollView( child: Column(
+          children: <Widget>[
+            Center(
+                child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Goal Progress Map',
+                          style: GoogleFonts.roboto(
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )))),
+
+    SizedBox(
+      height: 500,
+        child: Padding(
+        padding: EdgeInsets.all(7.0), 
+        child: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: 18,),
+          ),
+        )
       ),
-      backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      body: Column(
-        children: <Widget> [
-      
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text('Goal Progress Map',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
-    
-      Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-        child: Align(
-          alignment: Alignment.centerLeft,)),
-  
+
       Divider(color: Color.fromARGB(255, 255, 255, 255)),
-        ],
-    ));
+
+      Center(
+          child: Container(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Goal Progress',
+                    style: GoogleFonts.roboto(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold),
+                  )))),
+                  SizedBox(height: 75.0,
+                width: 75.0,
+                    child: CircularProgressIndicator(
+        value: 0.25,
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        valueColor: AlwaysStoppedAnimation(Color.fromARGB(255, 43, 121, 194)),
+        strokeWidth: 12,
+        
+        semanticsLabel: 'Circular progress indicator',
+            )),
+
+            Divider(color: Color.fromARGB(255, 255, 255, 255)),
+          ],
+        )));
   }
 }
 
-class DetailScreen extends StatelessWidget {
-  // In the constructor, require a Goal.
-  const DetailScreen({super.key, required this.goal});
 
-  // Declare a field that holds the Goal.
+class DetailScreen extends StatefulWidget {
   final Todo goal;
+  
+  const DetailScreen({super.key, required this.goal});
+  
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+  
+}
 
+class _DetailScreenState extends State<DetailScreen> {
+  late GoogleMapController mapController;
+  Set<Circle> circles = Set.from([Circle(
+    circleId: CircleId("geofence"),
+    center: LatLng(29.648198545235758, -82.34372474439299),
+    radius: 65,
+    fillColor: Color.fromARGB(92, 43, 121, 194),
+    strokeColor: Color.fromARGB(122, 43, 121, 194),
+)]);
+  Set<Marker> _markers = {};
+
+  final LatLng _center = const LatLng(29.648198545235758, -82.34372474439299);
+  
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+  
   @override
   Widget build(BuildContext context) {
     // Use the Goal to create the UI.
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text(goal.name, style: TextStyle(color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
+        title: Text(widget.goal.name, style: TextStyle(color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
       
       body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget> [
       
       Center(child:Container(
@@ -318,10 +397,13 @@ class DetailScreen extends StatelessWidget {
       Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
         child: Align(
           alignment: Alignment.centerLeft,
-          child:Text(goal.description ?? "",
+          child:Text(widget.goal.description ?? "",
             textAlign: TextAlign.left,
             style: GoogleFonts.roboto(color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 20,),))),
+            fontSize: 20,),
+            )
+          )
+      ),
   
       Divider(color: Color.fromARGB(255, 255, 255, 255)),
 
@@ -333,12 +415,16 @@ class DetailScreen extends StatelessWidget {
             style: GoogleFonts.roboto(
             color: Color.fromARGB(255, 43, 121, 194),
             fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
+            fontWeight: FontWeight.bold),
+            )
+          )
+        )
+      ),
       
       //progress bar
       Center(child:Container(
         padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-        color: Color.fromARGB(255, 150, 155, 159),
+        color: Color.fromARGB(132, 56, 56, 56),
         child:
           LinearProgressIndicator(
             minHeight: 7,
@@ -355,9 +441,25 @@ class DetailScreen extends StatelessWidget {
             style: GoogleFonts.roboto(
             color: Color.fromARGB(255, 43, 121, 194),
             fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
-
-        ],
+            fontWeight: FontWeight.bold),
+            )
+          )
+        )
+      ),
+      
+      Expanded(child: Padding(
+        padding: EdgeInsets.all(7.0), 
+        child: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: 18,),
+        circles: circles,
+          ),
+        )
+      ),
+    ],
+        
       ),
     )
     ;
@@ -600,7 +702,7 @@ class _AddTodoFormState extends State<AddTodoForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Todo'),
+        title: const Text('Add Goal'),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
       body: Padding(
@@ -612,12 +714,12 @@ class _AddTodoFormState extends State<AddTodoForm> {
               TextFormField(
                 controller: _nameController,
                 decoration:
-                    const InputDecoration(filled: true, labelText: 'Name', labelStyle: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+                    const InputDecoration(filled: true, fillColor: Colors.white, labelText: 'Name', labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
-                    filled: true, labelText: 'Description', labelStyle: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+                    filled: true, labelText: 'Description', fillColor: Colors.white, labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
               ElevatedButton(
                 onPressed: _saveTodo,
