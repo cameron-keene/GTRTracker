@@ -41,8 +41,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   google_fonts: ^3.0.1
-  easy_geofencing: ^0.2.0
   geocoding: ^2.0.5
+  geofence_service: ^3.5.0
+  flutter_foreground_task: ^3.8.2
 
 dev_dependencies:
   flutter_test:
