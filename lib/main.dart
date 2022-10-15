@@ -85,20 +85,23 @@ class _TodosPageState extends State<TodosPage> {
     // _todos is set to the value in the latest snapshot
     _subscription = Amplify.DataStore.observeQuery(Todo.classType)
         .listen((QuerySnapshot<Todo> snapshot) {
-      if (mounted) { setState(() {
-        if (_isLoading) _isLoading = false;
-        _todos = snapshot.items;
-      });
-    }});
+      if (mounted) {
+        setState(() {
+          if (_isLoading) _isLoading = false;
+          _todos = snapshot.items;
+        });
+      }
+    });
   }
 
-  Future<void> requestPermission() async { await Permission.location.request(); }
+  Future<void> requestPermission() async {
+    await Permission.location.request();
+  }
 
   Future<void> _configureAmplify() async {
-    if (Amplify.isConfigured){
+    if (Amplify.isConfigured) {
       null;
-    }
-    else{
+    } else {
       await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
     }
     try {
@@ -116,7 +119,8 @@ class _TodosPageState extends State<TodosPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: const Text('Goals', style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+        title: const Text('Goals',
+            style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
       // body: const Center(child: CircularProgressIndicator()),
@@ -148,16 +152,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
   @override
   final _dataStorePlugin =
-    AmplifyDataStore(modelProvider: ModelProvider.instance);
+      AmplifyDataStore(modelProvider: ModelProvider.instance);
   final AmplifyAPI _apiPlugin = AmplifyAPI();
   void initState() {
-  // kick off app initialization
-  readFromDatabase();
+    // kick off app initialization
+    readFromDatabase();
 
-  super.initState();
+    super.initState();
   }
 
   late StreamSubscription<QuerySnapshot<Todo>> _subscription;
@@ -165,10 +168,9 @@ class _HomePageState extends State<HomePage> {
   List<Todo> _todos = [];
 
   Future<void> readFromDatabase() async {
-    if (Amplify.isConfigured){
+    if (Amplify.isConfigured) {
       null;
-    }
-    else{
+    } else {
       await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
     }
     try {
@@ -181,13 +183,14 @@ class _HomePageState extends State<HomePage> {
     }
     _subscription = Amplify.DataStore.observeQuery(Todo.classType)
         .listen((QuerySnapshot<Todo> snapshot) {
-        if (mounted) { 
-          setState(() {
-            if (_isLoading) _isLoading = false;
-            _todos = snapshot.items;
-          });
-    }});
-}
+      if (mounted) {
+        setState(() {
+          if (_isLoading) _isLoading = false;
+          _todos = snapshot.items;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -195,84 +198,90 @@ class _HomePageState extends State<HomePage> {
       borderRadius: BorderRadius.circular(15.0),
     );
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 27, 27, 27),
+          title: Text("Home",
+              style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
+        ),
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text("Home", style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
-      ),
-      backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView( child: Column(
-        children: <Widget> [
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-        child: Align(
-          alignment: Alignment.center,
-          child:Text('Current Goals',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
-    
-      const Padding(padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-        child: Align(
-        alignment: Alignment.centerLeft,)),
-          ListTileTheme(
-          contentPadding: const EdgeInsets.all(8),
-          iconColor: Color.fromARGB(255, 0, 0, 0),
-          textColor: Color.fromARGB(255, 0, 0, 0),
-          tileColor: Color.fromARGB(255, 255, 255, 255),
-          style: ListTileStyle.list,
-          dense: true,
-          child: 
-          ListView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(8.0),
-            itemCount: _todos.length,
-            itemBuilder: (context, index) {
-            return Card(
-              child: ListTile(
-                shape: border,
-              trailing: Icon(Icons.more_vert),
-              title: Text(_todos[index].name, textScaleFactor: 1.5, style: GoogleFonts.roboto(fontSize: 13,fontWeight: FontWeight.w500), ),
-
-              onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DetailScreen(goal: _todos[index]),
-                ),
-              );
-            },
-          ));
-        },
-      ),
-    )
-    ])));
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(children: <Widget>[
+                Center(
+                    child: Container(
+                        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Current Goals',
+                              style: GoogleFonts.roboto(
+                                  color: Color.fromARGB(255, 255, 255, 255),
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            )))),
+                const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                    )),
+                ListTileTheme(
+                  contentPadding: const EdgeInsets.all(8),
+                  iconColor: Color.fromARGB(255, 0, 0, 0),
+                  textColor: Color.fromARGB(255, 0, 0, 0),
+                  tileColor: Color.fromARGB(255, 255, 255, 255),
+                  style: ListTileStyle.list,
+                  dense: true,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(8.0),
+                    itemCount: _todos.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                          child: ListTile(
+                        shape: border,
+                        trailing: Icon(Icons.more_vert),
+                        title: Text(
+                          _todos[index].name,
+                          textScaleFactor: 1.5,
+                          style: GoogleFonts.roboto(
+                              fontSize: 13, fontWeight: FontWeight.w500),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailScreen(goal: _todos[index]),
+                            ),
+                          );
+                        },
+                      ));
+                    },
+                  ),
+                )
+              ])));
   }
 }
 
-
-
 class AnalysisPage extends StatefulWidget {
   const AnalysisPage({Key? key}) : super(key: key);
-  
+
   @override
-  State<AnalysisPage> createState() => _AnalysisPageState();  
+  State<AnalysisPage> createState() => _AnalysisPageState();
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
   late GoogleMapController mapController;
 
   final LatLng _center = const LatLng(29.648198545235758, -82.34372474439299);
-  
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -282,7 +291,8 @@ class _AnalysisPageState extends State<AnalysisPage> {
               style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
         ),
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        body: SingleChildScrollView( child: Column(
+        body: SingleChildScrollView(
+            child: Column(
           children: <Widget>[
             Center(
                 child: Container(
@@ -296,193 +306,191 @@ class _AnalysisPageState extends State<AnalysisPage> {
                               fontSize: 25,
                               fontWeight: FontWeight.bold),
                         )))),
-
-    SizedBox(
-      height: 500,
-        child: Padding(
-        padding: EdgeInsets.all(7.0), 
-        child: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 18,),
-          ),
-        )
-      ),
-
-      Divider(color: Color.fromARGB(255, 255, 255, 255)),
-
-      Center(
-          child: Container(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Goal Progress',
-                    style: GoogleFonts.roboto(
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold),
-                  )))),
-                  SizedBox(height: 75.0,
+            SizedBox(
+                height: 500,
+                child: Padding(
+                  padding: EdgeInsets.all(7.0),
+                  child: GoogleMap(
+                    onMapCreated: _onMapCreated,
+                    initialCameraPosition: CameraPosition(
+                      target: _center,
+                      zoom: 18,
+                    ),
+                  ),
+                )),
+            Divider(color: Color.fromARGB(255, 255, 255, 255)),
+            Center(
+                child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Goal Progress',
+                          style: GoogleFonts.roboto(
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )))),
+            SizedBox(
+                height: 75.0,
                 width: 75.0,
-                    child: CircularProgressIndicator(
-        value: 0.25,
-        backgroundColor: Color.fromARGB(255, 255, 255, 255),
-        valueColor: AlwaysStoppedAnimation(Color.fromARGB(255, 43, 121, 194)),
-        strokeWidth: 12,
-        
-        semanticsLabel: 'Circular progress indicator',
-            )),
-
+                child: CircularProgressIndicator(
+                  value: 0.25,
+                  backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                  valueColor:
+                      AlwaysStoppedAnimation(Color.fromARGB(255, 43, 121, 194)),
+                  strokeWidth: 12,
+                  semanticsLabel: 'Circular progress indicator',
+                )),
             Divider(color: Color.fromARGB(255, 255, 255, 255)),
           ],
         )));
   }
 }
 
-
 class DetailScreen extends StatefulWidget {
   final Todo goal;
-  
+
   const DetailScreen({super.key, required this.goal});
-  
+
   @override
   State<DetailScreen> createState() => _DetailScreenState();
-  
 }
 
 class _DetailScreenState extends State<DetailScreen> {
   late GoogleMapController mapController;
-  Set<Circle> circles = Set.from([Circle(
-    circleId: CircleId("geofence"),
-    center: LatLng(29.648198545235758, -82.34372474439299),
-    radius: 65,
-    fillColor: Color.fromARGB(92, 43, 121, 194),
-    strokeColor: Color.fromARGB(122, 43, 121, 194),
-)]);
+  Set<Circle> circles = Set.from([
+    Circle(
+      circleId: CircleId("geofence"),
+      center: LatLng(29.648198545235758, -82.34372474439299),
+      radius: 65,
+      fillColor: Color.fromARGB(92, 43, 121, 194),
+      strokeColor: Color.fromARGB(122, 43, 121, 194),
+    )
+  ]);
   Set<Marker> _markers = {};
 
   final LatLng _center = const LatLng(29.648198545235758, -82.34372474439299);
-  
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     // Use the Goal to create the UI.
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text(widget.goal.name, style: TextStyle(color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
+        title: Text(widget.goal.name,
+            style: TextStyle(
+                color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      
       body: Column(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget> [
-      
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text('Goal Description',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 43, 121, 194),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),)))),
-      
-      //goal description
-      Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text(widget.goal.description ?? "",
-            textAlign: TextAlign.left,
-            style: GoogleFonts.roboto(color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 20,),
-            )
-          )
-      ),
-  
-      Divider(color: Color.fromARGB(255, 255, 255, 255)),
+        children: <Widget>[
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Description',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
 
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text('Goal Progress',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 43, 121, 194),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),
-            )
-          )
-        )
+          //goal description
+          Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.goal.description ?? "",
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.roboto(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 20,
+                    ),
+                  ))),
+
+          Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Progress',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
+
+          //progress bar
+          Center(
+              child: Container(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+            color: Color.fromARGB(132, 56, 56, 56),
+            child: LinearProgressIndicator(
+              minHeight: 7,
+              backgroundColor: Color.fromARGB(255, 255, 255, 255),
+              valueColor: new AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 43, 121, 194)),
+              value: 0.4,
+            ),
+          )), //update with current hours towards goal
+          Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Location',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
+
+          Expanded(
+              child: Padding(
+            padding: EdgeInsets.all(7.0),
+            child: GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 18,
+              ),
+              circles: circles,
+            ),
+          )),
+        ],
       ),
-      
-      //progress bar
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-        color: Color.fromARGB(132, 56, 56, 56),
-        child:
-          LinearProgressIndicator(
-            minHeight: 7,
-            backgroundColor: Color.fromARGB(255, 255, 255, 255),
-            valueColor: new AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 43, 121, 194)),
-            value: 0.4, ),)), //update with current hours towards goal
-      Divider(color: Color.fromARGB(255, 255, 255, 255)),
-      
-      Center(child:Container(
-        padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child:Text('Goal Location',
-            style: GoogleFonts.roboto(
-            color: Color.fromARGB(255, 43, 121, 194),
-            fontSize: 25,
-            fontWeight: FontWeight.bold),
-            )
-          )
-        )
-      ),
-      
-      Expanded(child: Padding(
-        padding: EdgeInsets.all(7.0), 
-        child: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 18,),
-        circles: circles,
-          ),
-        )
-      ),
-    ],
-        
-      ),
-    )
-    ;
+    );
   }
 }
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
-  
+
   @override
   _NavBarState createState() => _NavBarState();
 }
-  
+
 class _NavBarState extends State<NavBar> {
   int pageIndex = 0;
-  
+
   //array to connect pages to navbar
-  final pages = [
-    const HomePage(),
-    const TodosPage(),
-    const AnalysisPage()
-  ];
-  
+  final pages = [const HomePage(), const TodosPage(), const AnalysisPage()];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -491,17 +499,15 @@ class _NavBarState extends State<NavBar> {
       body: pages[pageIndex],
       bottomNavigationBar: Container(
         height: 60,
-        decoration: BoxDecoration(
-          color: Color.fromARGB(255, 27, 27, 27),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 12,
-              spreadRadius: 2,
-              offset: const Offset(2, -2),
-            ),
-          ]
-        ),
+        decoration:
+            BoxDecoration(color: Color.fromARGB(255, 27, 27, 27), boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 12,
+            spreadRadius: 2,
+            offset: const Offset(2, -2),
+          ),
+        ]),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -582,7 +588,6 @@ class TodosList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return todos.isNotEmpty
         ? ListView(
             padding: const EdgeInsets.all(8),
@@ -672,17 +677,26 @@ class AddTodoForm extends StatefulWidget {
 class _AddTodoFormState extends State<AddTodoForm> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _goalDurationController = TextEditingController();
+  final _addressController = TextEditingController();
 
   Future<void> _saveTodo() async {
     // get the current text field contents
     final name = _nameController.text;
     final description = _descriptionController.text;
+    final goalDuration = int.parse(_goalDurationController.text);
+    final location = double.parse(_addressController
+        .text); //TODO: function to extract latitude and longitude
 
     // create a new Todo from the form values
     // `isComplete` is also required, but should start false in a new Todo
     final newTodo = Todo(
       name: name,
       description: description.isNotEmpty ? description : null,
+      goalDuration: goalDuration,
+      currentDuration: 0,
+      latitude: location, //TODO: change
+      longitude: location, //TODO: change
       isComplete: false,
     );
 
@@ -713,13 +727,27 @@ class _AddTodoFormState extends State<AddTodoForm> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration:
-                    const InputDecoration(filled: true, fillColor: Colors.white, labelText: 'Name', labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: 'Name',
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
-                    filled: true, labelText: 'Description', fillColor: Colors.white, labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                    filled: true,
+                    labelText: 'Description',
+                    fillColor: Colors.white,
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+              ),
+              TextFormField(
+                controller: _goalDurationController,
+                decoration: const InputDecoration(
+                    filled: true,
+                    labelText: 'Goal Duration',
+                    fillColor: Colors.white,
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
               ElevatedButton(
                 onPressed: _saveTodo,
