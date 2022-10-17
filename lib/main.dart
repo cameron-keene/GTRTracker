@@ -866,6 +866,7 @@ void startCallback() {
 class MyTaskHandler extends TaskHandler {
   SendPort? _sendPort;
   int _eventCount = 0;
+  final geofence testGeo = geofence();
 
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
@@ -880,10 +881,7 @@ class MyTaskHandler extends TaskHandler {
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     debugPrint("on event - event count task running in background");
-    FlutterForegroundTask.updateService(
-      notificationTitle: 'MyTaskHandler',
-      notificationText: 'eventCount: $_eventCount',
-    );
+    testGeo.geofenceInitial();
     // call the flutter geofence_service update.
 
     // Send data to the main isolate.
@@ -934,6 +932,8 @@ class ExampleApp extends StatelessWidget {
 }
 
 class ExamplePage extends StatefulWidget {
+  final geofence testGeo = geofence();
+
   ExamplePage({Key? key}) : super(key: key);
 
   @override
@@ -941,6 +941,131 @@ class ExamplePage extends StatefulWidget {
 }
 
 class _ExamplePageState extends State<ExamplePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      debugPrint("starting geofence.....");
+      widget.testGeo.geofenceInitial();
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.testGeo._activityStreamController.close();
+    widget.testGeo._geofenceStreamController.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: WillStartForegroundTask(
+        onWillStart: () async {
+          debugPrint("onWillStart Notification ----------");
+
+          // You can add a foreground task start condition.
+          return widget.testGeo._geofenceService.isRunningService;
+        },
+        androidNotificationOptions: AndroidNotificationOptions(
+          channelId: 'geofence_service_notification_channel',
+          channelName: 'Geofence Service Notification',
+          channelDescription:
+              'This notification appears when the geofence service is running in the background.',
+          channelImportance: NotificationChannelImportance.LOW,
+          priority: NotificationPriority.LOW,
+          isSticky: false,
+        ),
+        iosNotificationOptions: const IOSNotificationOptions(),
+        notificationTitle: 'Geofence Service is running',
+        notificationText: 'Tap to return to the app',
+        foregroundTaskOptions: const ForegroundTaskOptions(
+          interval: 5000,
+          autoRunOnBoot: false,
+          allowWifiLock: false,
+        ),
+        callback: startCallback,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Geofence Service'),
+            centerTitle: true,
+          ),
+          body: _buildContentView(),
+        ),
+      ),
+    );
+  }
+
+  void _combinedStart() {
+    if (widget.testGeo._geofenceService.isRunningService) {
+      debugPrint("geofence is running");
+    } else {
+      debugPrint("geofence is not running");
+    }
+  }
+
+  Widget _buildContentView() {
+    buttonBuilder(String text, {VoidCallback? onPressed}) {
+      return ElevatedButton(
+        child: Text(text),
+        onPressed: onPressed,
+      );
+    }
+
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(8.0),
+      children: [
+        _buildActivityMonitor(),
+        const SizedBox(height: 20.0),
+        _buildGeofenceMonitor(),
+        const SizedBox(height: 20.0),
+        buttonBuilder('start', onPressed: _combinedStart),
+        // buttonBuilder('stop', onPressed: _stopForegroundTask),
+      ],
+    );
+  }
+
+  Widget _buildActivityMonitor() {
+    return StreamBuilder<Activity>(
+      stream: widget.testGeo._activityStreamController.stream,
+      builder: (context, snapshot) {
+        final updatedDateTime = DateTime.now();
+        final content = snapshot.data?.toJson().toString() ?? '';
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('•\t\tActivity (updated: $updatedDateTime)'),
+            const SizedBox(height: 10.0),
+            Text(content),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildGeofenceMonitor() {
+    return StreamBuilder<Geofence>(
+      stream: widget.testGeo._geofenceStreamController.stream,
+      builder: (context, snapshot) {
+        final updatedDateTime = DateTime.now();
+        final content = snapshot.data?.toJson().toString() ?? '';
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('•\t\tGeofence (updated: $updatedDateTime)'),
+            const SizedBox(height: 10.0),
+            Text(content),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class geofence {
   final _activityStreamController = StreamController<Activity>();
   final _geofenceStreamController = StreamController<Geofence>();
 // Create a [GeofenceService] instance and set options.
@@ -978,43 +1103,6 @@ class _ExamplePageState extends State<ExamplePage> {
       ],
     ),
   ];
-
-  ReceivePort? _receivePort;
-
-  void _initForegroundTask() {
-    FlutterForegroundTask.init(
-      androidNotificationOptions: AndroidNotificationOptions(
-        channelId: 'notification_channel_id',
-        channelName: 'Foreground Notification',
-        channelDescription:
-            'This notification appears when the foreground service is running.',
-        channelImportance: NotificationChannelImportance.LOW,
-        priority: NotificationPriority.LOW,
-        iconData: const NotificationIconData(
-          resType: ResourceType.mipmap,
-          resPrefix: ResourcePrefix.ic,
-          name: 'launcher',
-          backgroundColor: Colors.orange,
-        ),
-        buttons: [
-          const NotificationButton(id: 'sendButton', text: 'Send'),
-          const NotificationButton(id: 'testButton', text: 'Test'),
-        ],
-      ),
-      iosNotificationOptions: const IOSNotificationOptions(
-        showNotification: true,
-        playSound: false,
-      ),
-      foregroundTaskOptions: const ForegroundTaskOptions(
-        interval: 5000,
-        isOnceEvent: false,
-        autoRunOnBoot: true,
-        allowWakeLock: true,
-        allowWifiLock: true,
-      ),
-    );
-  }
-
   // This function is to be called when the geofence status is changed.
   Future<void> _onGeofenceStatusChanged(
       Geofence geofence,
@@ -1056,243 +1144,13 @@ class _ExamplePageState extends State<ExamplePage> {
     print('ErrorCode: $errorCode');
   }
 
-  Future<bool> _startForegroundTask() async {
-    // "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted for
-    // onNotificationPressed function to be called.
-    //
-    // When the notification is pressed while permission is denied,
-    // the onNotificationPressed function is not called and the app opens.
-    //
-    // If you do not use the onNotificationPressed or launchApp function,
-    // you do not need to write this code.
-    if (!await FlutterForegroundTask.canDrawOverlays) {
-      final isGranted =
-          await FlutterForegroundTask.openSystemAlertWindowSettings();
-      if (!isGranted) {
-        print('SYSTEM_ALERT_WINDOW permission denied!');
-        return false;
-      }
-    }
-
-    // You can save data using the saveData function.
-    await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
-
-    bool reqResult;
-    if (await FlutterForegroundTask.isRunningService) {
-      reqResult = await FlutterForegroundTask.restartService();
-    } else {
-      reqResult = await FlutterForegroundTask.startService(
-        notificationTitle: 'Foreground Service is running',
-        notificationText: 'Tap to return to the app',
-        callback: startCallback,
-      );
-    }
-
-    ReceivePort? receivePort;
-    if (reqResult) {
-      receivePort = await FlutterForegroundTask.receivePort;
-    }
-
-    return _registerReceivePort(receivePort);
-  }
-
-  Future<bool> _stopForegroundTask() async {
-    return await FlutterForegroundTask.stopService();
-  }
-
-  bool _registerReceivePort(ReceivePort? receivePort) {
-    _closeReceivePort();
-
-    if (receivePort != null) {
-      _receivePort = receivePort;
-      _receivePort?.listen((message) {
-        if (message is int) {
-          print('eventCount: $message');
-        } else if (message is String) {
-          if (message == 'onNotificationPressed') {
-            Navigator.of(context).pushNamed('/resume-route');
-          }
-        } else if (message is DateTime) {
-          print('timestamp: ${message.toString()}');
-        }
-      });
-
-      return true;
-    }
-
-    return false;
-  }
-
-  void _closeReceivePort() {
-    _receivePort?.close();
-    _receivePort = null;
-  }
-
-  T? _ambiguate<T>(T? value) => value;
-
-  @override
-  void initState() {
-    super.initState();
-    _initForegroundTask();
-    _ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
-      // You can get the previous ReceivePort without restarting the service.
-      if (await FlutterForegroundTask.isRunningService) {
-        final newReceivePort = await FlutterForegroundTask.receivePort;
-        _registerReceivePort(newReceivePort);
-      }
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      debugPrint("starting geofence.....");
-      _geofenceService
-          .addGeofenceStatusChangeListener(_onGeofenceStatusChanged);
-      _geofenceService.addLocationChangeListener(_onLocationChanged);
-      _geofenceService.addLocationServicesStatusChangeListener(
-          _onLocationServicesStatusChanged);
-      _geofenceService.addActivityChangeListener(_onActivityChanged);
-      _geofenceService.addStreamErrorListener(_onError);
-      _geofenceService.start(_geofenceList).catchError(_onError);
-    });
-  }
-
-  @override
-  void dispose() {
-    _activityStreamController.close();
-    _geofenceStreamController.close();
-    _closeReceivePort();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // A widget that prevents the app from closing when the foreground service is running.
-    // This widget must be declared above the [Scaffold] widget.
-    // return WithForegroundTask(
-    //   child: Scaffold(
-    //     appBar: AppBar(
-    //       title: const Text('Flutter Foreground Task'),
-    //       centerTitle: true,
-    //     ),
-    //     body: _buildContentView(),
-    //   ),
-    // );
-    return MaterialApp(
-      home: WillStartForegroundTask(
-        onWillStart: () async {
-          // You can add a foreground task start condition.
-          return _geofenceService.isRunningService;
-        },
-        androidNotificationOptions: AndroidNotificationOptions(
-          channelId: 'geofence_service_notification_channel',
-          channelName: 'Geofence Service Notification',
-          channelDescription:
-              'This notification appears when the geofence service is running in the background.',
-          channelImportance: NotificationChannelImportance.LOW,
-          priority: NotificationPriority.LOW,
-          isSticky: false,
-        ),
-        iosNotificationOptions: const IOSNotificationOptions(),
-        notificationTitle: 'Geofence Service is running',
-        notificationText: 'Tap to return to the app',
-        foregroundTaskOptions: const ForegroundTaskOptions(
-          interval: 5000,
-          autoRunOnBoot: false,
-          allowWifiLock: false,
-        ),
-        callback: startCallback,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Geofence Service'),
-            centerTitle: true,
-          ),
-          body: _buildContentView(),
-        ),
-      ),
-    );
-  }
-
-  void _combinedStart() {
-    _startForegroundTask();
-    if (_geofenceService.isRunningService) {
-      debugPrint("geofence is running");
-    } else {
-      debugPrint("geofence is not running");
-    }
-  }
-
-  // Widget _buildContentView() {
-  //   buttonBuilder(String text, {VoidCallback? onPressed}) {
-  //     return ElevatedButton(
-  //       child: Text(text),
-  //       onPressed: onPressed,
-  //     );
-  //   }
-
-  //   return Center(
-  //     child: Column(
-  //       mainAxisAlignment: MainAxisAlignment.center,
-  //       children: [
-  //         buttonBuilder('start', onPressed: _combinedStart),
-  //         buttonBuilder('stop', onPressed: _stopForegroundTask),
-  //       ],
-  //     ),
-  //   );
-  Widget _buildContentView() {
-    buttonBuilder(String text, {VoidCallback? onPressed}) {
-      return ElevatedButton(
-        child: Text(text),
-        onPressed: onPressed,
-      );
-    }
-
-    return ListView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(8.0),
-      children: [
-        _buildActivityMonitor(),
-        const SizedBox(height: 20.0),
-        _buildGeofenceMonitor(),
-        const SizedBox(height: 20.0),
-        buttonBuilder('start', onPressed: _combinedStart),
-        buttonBuilder('stop', onPressed: _stopForegroundTask),
-      ],
-    );
-  }
-
-  Widget _buildActivityMonitor() {
-    return StreamBuilder<Activity>(
-      stream: _activityStreamController.stream,
-      builder: (context, snapshot) {
-        final updatedDateTime = DateTime.now();
-        final content = snapshot.data?.toJson().toString() ?? '';
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('•\t\tActivity (updated: $updatedDateTime)'),
-            const SizedBox(height: 10.0),
-            Text(content),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildGeofenceMonitor() {
-    return StreamBuilder<Geofence>(
-      stream: _geofenceStreamController.stream,
-      builder: (context, snapshot) {
-        final updatedDateTime = DateTime.now();
-        final content = snapshot.data?.toJson().toString() ?? '';
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('•\t\tGeofence (updated: $updatedDateTime)'),
-            const SizedBox(height: 10.0),
-            Text(content),
-          ],
-        );
-      },
-    );
+  void geofenceInitial() {
+    _geofenceService.addGeofenceStatusChangeListener(_onGeofenceStatusChanged);
+    _geofenceService.addLocationChangeListener(_onLocationChanged);
+    _geofenceService.addLocationServicesStatusChangeListener(
+        _onLocationServicesStatusChanged);
+    _geofenceService.addActivityChangeListener(_onActivityChanged);
+    _geofenceService.addStreamErrorListener(_onError);
+    _geofenceService.start(_geofenceList).catchError(_onError);
   }
 }
