@@ -23,14 +23,18 @@ import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/foundation.dart';
 
 
-/** This is an auto generated class representing the Todo type in your schema. */
+/** This is an auto generated class representing the Goal type in your schema. */
 @immutable
-class Todo extends Model {
-  static const classType = const _TodoModelType();
+class Goal extends Model {
+  static const classType = const _GoalModelType();
   final String id;
   final String? _name;
   final String? _description;
   final bool? _isComplete;
+  final int? _goalDuration;
+  final int? _currentDuration;
+  final double? _latitude;
+  final double? _longitude;
   final TemporalDateTime? _createdAt;
   final TemporalDateTime? _updatedAt;
 
@@ -72,6 +76,58 @@ class Todo extends Model {
     }
   }
   
+  int get goalDuration {
+    try {
+      return _goalDuration!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
+  int get currentDuration {
+    try {
+      return _currentDuration!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
+  double get latitude {
+    try {
+      return _latitude!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
+  double get longitude {
+    try {
+      return _longitude!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
   TemporalDateTime? get createdAt {
     return _createdAt;
   }
@@ -80,14 +136,18 @@ class Todo extends Model {
     return _updatedAt;
   }
   
-  const Todo._internal({required this.id, required name, description, required isComplete, createdAt, updatedAt}): _name = name, _description = description, _isComplete = isComplete, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Goal._internal({required this.id, required name, description, required isComplete, required goalDuration, required currentDuration, required latitude, required longitude, createdAt, updatedAt}): _name = name, _description = description, _isComplete = isComplete, _goalDuration = goalDuration, _currentDuration = currentDuration, _latitude = latitude, _longitude = longitude, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Todo({String? id, required String name, String? description, required bool isComplete}) {
-    return Todo._internal(
+  factory Goal({String? id, required String name, String? description, required bool isComplete, required int goalDuration, required int currentDuration, required double latitude, required double longitude}) {
+    return Goal._internal(
       id: id == null ? UUID.getUUID() : id,
       name: name,
       description: description,
-      isComplete: isComplete);
+      isComplete: isComplete,
+      goalDuration: goalDuration,
+      currentDuration: currentDuration,
+      latitude: latitude,
+      longitude: longitude);
   }
   
   bool equals(Object other) {
@@ -97,11 +157,15 @@ class Todo extends Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Todo &&
+    return other is Goal &&
       id == other.id &&
       _name == other._name &&
       _description == other._description &&
-      _isComplete == other._isComplete;
+      _isComplete == other._isComplete &&
+      _goalDuration == other._goalDuration &&
+      _currentDuration == other._currentDuration &&
+      _latitude == other._latitude &&
+      _longitude == other._longitude;
   }
   
   @override
@@ -111,11 +175,15 @@ class Todo extends Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Todo {");
+    buffer.write("Goal {");
     buffer.write("id=" + "$id" + ", ");
     buffer.write("name=" + "$_name" + ", ");
     buffer.write("description=" + "$_description" + ", ");
     buffer.write("isComplete=" + (_isComplete != null ? _isComplete!.toString() : "null") + ", ");
+    buffer.write("goalDuration=" + (_goalDuration != null ? _goalDuration!.toString() : "null") + ", ");
+    buffer.write("currentDuration=" + (_currentDuration != null ? _currentDuration!.toString() : "null") + ", ");
+    buffer.write("latitude=" + (_latitude != null ? _latitude!.toString() : "null") + ", ");
+    buffer.write("longitude=" + (_longitude != null ? _longitude!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -123,33 +191,45 @@ class Todo extends Model {
     return buffer.toString();
   }
   
-  Todo copyWith({String? id, String? name, String? description, bool? isComplete}) {
-    return Todo._internal(
+  Goal copyWith({String? id, String? name, String? description, bool? isComplete, int? goalDuration, int? currentDuration, double? latitude, double? longitude}) {
+    return Goal._internal(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
-      isComplete: isComplete ?? this.isComplete);
+      isComplete: isComplete ?? this.isComplete,
+      goalDuration: goalDuration ?? this.goalDuration,
+      currentDuration: currentDuration ?? this.currentDuration,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude);
   }
   
-  Todo.fromJson(Map<String, dynamic> json)  
+  Goal.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
       _name = json['name'],
       _description = json['description'],
       _isComplete = json['isComplete'],
+      _goalDuration = (json['goalDuration'] as num?)?.toInt(),
+      _currentDuration = (json['currentDuration'] as num?)?.toInt(),
+      _latitude = (json['latitude'] as num?)?.toDouble(),
+      _longitude = (json['longitude'] as num?)?.toDouble(),
       _createdAt = json['createdAt'] != null ? TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'name': _name, 'description': _description, 'isComplete': _isComplete, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'name': _name, 'description': _description, 'isComplete': _isComplete, 'goalDuration': _goalDuration, 'currentDuration': _currentDuration, 'latitude': _latitude, 'longitude': _longitude, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField NAME = QueryField(fieldName: "name");
   static final QueryField DESCRIPTION = QueryField(fieldName: "description");
   static final QueryField ISCOMPLETE = QueryField(fieldName: "isComplete");
+  static final QueryField GOALDURATION = QueryField(fieldName: "goalDuration");
+  static final QueryField CURRENTDURATION = QueryField(fieldName: "currentDuration");
+  static final QueryField LATITUDE = QueryField(fieldName: "latitude");
+  static final QueryField LONGITUDE = QueryField(fieldName: "longitude");
   static var schema = Model.defineSchema(define: (ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Todo";
-    modelSchemaDefinition.pluralName = "Todos";
+    modelSchemaDefinition.name = "Goal";
+    modelSchemaDefinition.pluralName = "Goals";
     
     modelSchemaDefinition.authRules = [
       AuthRule(
@@ -165,21 +245,45 @@ class Todo extends Model {
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(ModelFieldDefinition.field(
-      key: Todo.NAME,
+      key: Goal.NAME,
       isRequired: true,
       ofType: ModelFieldType(ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.field(
-      key: Todo.DESCRIPTION,
+      key: Goal.DESCRIPTION,
       isRequired: false,
       ofType: ModelFieldType(ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.field(
-      key: Todo.ISCOMPLETE,
+      key: Goal.ISCOMPLETE,
       isRequired: true,
       ofType: ModelFieldType(ModelFieldTypeEnum.bool)
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: Goal.GOALDURATION,
+      isRequired: true,
+      ofType: ModelFieldType(ModelFieldTypeEnum.int)
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: Goal.CURRENTDURATION,
+      isRequired: true,
+      ofType: ModelFieldType(ModelFieldTypeEnum.int)
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: Goal.LATITUDE,
+      isRequired: true,
+      ofType: ModelFieldType(ModelFieldTypeEnum.double)
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: Goal.LONGITUDE,
+      isRequired: true,
+      ofType: ModelFieldType(ModelFieldTypeEnum.double)
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.nonQueryField(
@@ -198,11 +302,11 @@ class Todo extends Model {
   });
 }
 
-class _TodoModelType extends ModelType<Todo> {
-  const _TodoModelType();
+class _GoalModelType extends ModelType<Goal> {
+  const _GoalModelType();
   
   @override
-  Todo fromJson(Map<String, dynamic> jsonData) {
-    return Todo.fromJson(jsonData);
+  Goal fromJson(Map<String, dynamic> jsonData) {
+    return Goal.fromJson(jsonData);
   }
 }

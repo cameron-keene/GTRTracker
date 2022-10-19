@@ -82,9 +82,7 @@ class _geofenceFeatureState extends State<geofenceFeature> {
       ),
       foregroundTaskOptions: const ForegroundTaskOptions(
         interval: 5000,
-        isOnceEvent: false,
         autoRunOnBoot: true,
-        allowWakeLock: true,
         allowWifiLock: true,
       ),
     );
