@@ -1,5 +1,6 @@
 // dart async library we will refer to when setting up real time updates
 import 'dart:async';
+import 'dart:collection';
 
 // flutter and ui libraries
 import 'package:flutter/material.dart';
@@ -9,9 +10,11 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gtrtracker/goalClass/Goal.dart';
 
 // amplify configuration and models that should have been generated for you
-import 'amplifyconfiguration.dart';
+import 'amplifyconfiguration.dar
 import 'models/ModelProvider.dart' hide Location;
 
 // page import
@@ -49,110 +52,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class GoalsPage extends StatefulWidget {
-  const GoalsPage({Key? key}) : super(key: key);
-
-  @override
-  State<GoalsPage> createState() => _GoalsPageState();
-}
-
-class _GoalsPageState extends State<GoalsPage> {
-  // subscription of Goal QuerySnapshots - to be initialized at runtime
-  late StreamSubscription<QuerySnapshot<Goal>> _subscription;
-
-  // loading ui state - initially set to a loading state
-  bool _isLoading = true;
-
-  // list of Goals - initially empty
-  List<Goal> _goals = [];
-
-  // amplify plugins
-  final _dataStorePlugin =
-      AmplifyDataStore(modelProvider: ModelProvider.instance);
-  final AmplifyAPI _apiPlugin = AmplifyAPI();
-  // final AmplifyAuthCognito _authPlugin = AmplifyAuthCognito();
-  @override
-  void initState() {
-    // kick off app initialization
-    _initializeApp();
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // to be filled in a later step
-    super.dispose();
-  }
-
-  Future<void> _initializeApp() async {
-    // configure Amplify
-    await _configureAmplify();
-
-    // Query and Observe updates to Goal models. DataStore.observeQuery() will
-    // emit an initial QuerySnapshot with a list of Goal models in the local store,
-    // and will emit subsequent snapshots as updates are made
-    //
-    // each time a snapshot is received, the following will happen:
-    // _isLoading is set to false if it is not already false
-    // _Goals is set to the value in the latest snapshot
-    _subscription = Amplify.DataStore.observeQuery(Goal.classType)
-        .listen((QuerySnapshot<Goal> snapshot) {
-      if (mounted) {
-        setState(() {
-          if (_isLoading) _isLoading = false;
-          _goals = snapshot.items;
-        });
-      }
-    });
-  }
-
-  Future<void> _configureAmplify() async {
-    if (Amplify.isConfigured) {
-      null;
-    } else {
-      await Amplify.addPlugins([_dataStorePlugin, _apiPlugin]); //, _authPlugin
-    }
-    try {
-      await Amplify.configure(amplifyconfig);
-    } on AmplifyAlreadyConfiguredException {
-      print(
-          "Tried to reconfigure Amplify; this can occur when your app restarts on Android.");
-    } on AmplifyException catch (e) {
-      throw AmplifyException(e.message);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: const Text('My Goal List',
-            style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
-      ),
-      backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      // body: const Center(child: CircularProgressIndicator()),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : GoalsList(goals: _goals),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddGoalForm()),
-          );
-        },
-        tooltip: 'Add Goal',
-        label: Row(
-          children: const [Icon(Icons.add), Text('Add Goal')],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-}
-
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
   final geofence testGeo = geofence();
@@ -175,6 +74,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     debugPrint("starting geofence.....");
     widget.testGeo.geofenceInitial();
+
   }
 
   late StreamSubscription<QuerySnapshot<Goal>> _subscription;
@@ -230,6 +130,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       debugPrint("paused");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -411,6 +312,7 @@ class AnalysisPage extends StatelessWidget {
             Divider(color: Color.fromARGB(255, 255, 255, 255)),
           ],
         ));
+
   }
 }
 
@@ -426,6 +328,7 @@ class _NavBarState extends State<NavBar> {
 
   //array to connect pages to navbar
   final pages = [HomePage(), const GoalsPage(), const AnalysisPage()];
+
 
   @override
   Widget build(BuildContext context) {

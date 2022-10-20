@@ -44,6 +44,8 @@ dependencies:
   geocoding: ^2.0.5
   geofence_service: ^3.5.0
   flutter_foreground_task: ^3.8.2
+  google_maps_flutter: ^2.2.1
+
 
 dev_dependencies:
   flutter_test:
