@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'analysisPage.dart';
 import 'homePage.dart';
-import 'todoPage.dart';
+import 'goalPage.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
@@ -18,7 +18,7 @@ class _NavBarState extends State<NavBar> {
   int pageIndex = 0;
 
   //array to connect pages to navbar
-  final pages = [const HomePage(), const TodosPage(), const AnalysisPage()];
+  final pages = [const HomePage(), const GoalsPage(), const AnalysisPage()];
 
   @override
   Widget build(BuildContext context) {

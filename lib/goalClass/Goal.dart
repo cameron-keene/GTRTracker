@@ -5,54 +5,54 @@ import 'package:gtrtracker/models/ModelProvider.dart';
 // amplify packages we will need to use
 import 'package:amplify_flutter/amplify_flutter.dart';
 
-class TodosList extends StatelessWidget {
-  const TodosList({
-    required this.todos,
+class GoalsList extends StatelessWidget {
+  const GoalsList({
+    required this.goals,
     Key? key,
   }) : super(key: key);
 
-  final List<Todo> todos;
+  final List<Goal> goals;
 
   @override
   Widget build(BuildContext context) {
-    return todos.isNotEmpty
+    return goals.isNotEmpty
         ? ListView(
             padding: const EdgeInsets.all(8),
-            children: todos.map((todo) => TodoItem(todo: todo)).toList())
+            children: goals.map((goal) => GoalItem(goal: goal)).toList())
         : const Center(
-            child: Text('Tap button below to add a todo!'),
+            child: Text('Tap button below to add a goal!'),
           );
   }
 }
 
-class TodoItem extends StatelessWidget {
-  const TodoItem({
-    required this.todo,
+class GoalItem extends StatelessWidget {
+  const GoalItem({
+    required this.goal,
     Key? key,
   }) : super(key: key);
 
   final double iconSize = 24.0;
-  final Todo todo;
+  final Goal goal;
 
-  void _deleteTodo(BuildContext context) async {
+  void _deleteGoal(BuildContext context) async {
     try {
       // to delete data from DataStore, we pass the model instance to
       // Amplify.DataStore.delete()
-      await Amplify.DataStore.delete(todo);
+      await Amplify.DataStore.delete(goal);
     } catch (e) {
-      print('An error occurred while deleting Todo: $e');
+      print('An error occurred while deleting Goal: $e');
     }
   }
 
   Future<void> _toggleIsComplete() async {
-    // copy the Todo we wish to update, but with updated properties
-    final updatedTodo = todo.copyWith(isComplete: !todo.isComplete);
+    // copy the Goal we wish to update, but with updated properties
+    final updatedGoal = goal.copyWith(isComplete: !goal.isComplete);
     try {
       // to update data in DataStore, we again pass an instance of a model to
       // Amplify.DataStore.save()
-      await Amplify.DataStore.save(updatedTodo);
+      await Amplify.DataStore.save(updatedGoal);
     } catch (e) {
-      print('An error occurred while saving Todo: $e');
+      print('An error occurred while saving Goal: $e');
     }
   }
 
@@ -64,7 +64,7 @@ class TodoItem extends StatelessWidget {
           _toggleIsComplete();
         },
         onLongPress: () {
-          _deleteTodo(context);
+          _deleteGoal(context);
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -74,16 +74,16 @@ class TodoItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    todo.name,
+                    goal.name,
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  Text(todo.description ?? 'No description'),
+                  Text(goal.description ?? 'No description'),
                 ],
               ),
             ),
             Icon(
-                todo.isComplete
+                goal.isComplete
                     ? Icons.check_box
                     : Icons.check_box_outline_blank,
                 size: iconSize),

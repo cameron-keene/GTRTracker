@@ -7,29 +7,28 @@ import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 // amplify configuration and models that should have been generated for you
 import 'package:gtrtracker/amplifyconfiguration.dart';
 import 'package:gtrtracker/models/ModelProvider.dart';
-import 'package:gtrtracker/todoClass/todo.dart';
+import 'package:gtrtracker/goalClass/Goal.dart';
 
-class TodosPage extends StatefulWidget {
-  const TodosPage({Key? key}) : super(key: key);
+class GoalsPage extends StatefulWidget {
+  const GoalsPage({Key? key}) : super(key: key);
 
   @override
-  State<TodosPage> createState() => _TodosPageState();
+  State<GoalsPage> createState() => _GoalsPageState();
 }
 
-class _TodosPageState extends State<TodosPage> {
-  // subscription of Todo QuerySnapshots - to be initialized at runtime
-  late StreamSubscription<QuerySnapshot<Todo>> _subscription;
+class _GoalsPageState extends State<GoalsPage> {
+  // subscription of Goal QuerySnapshots - to be initialized at runtime
+  late StreamSubscription<QuerySnapshot<Goal>> _subscription;
 
   // loading ui state - initially set to a loading state
   bool _isLoading = true;
 
-  // list of Todos - initially empty
-  List<Todo> _todos = [];
+  // list of Goals - initially empty
+  List<Goal> _goals = [];
 
   // amplify plugins
   final _dataStorePlugin =
@@ -53,28 +52,23 @@ class _TodosPageState extends State<TodosPage> {
   Future<void> _initializeApp() async {
     // configure Amplify
     await _configureAmplify();
-    await requestPermission();
 
-    // Query and Observe updates to Todo models. DataStore.observeQuery() will
-    // emit an initial QuerySnapshot with a list of Todo models in the local store,
+    // Query and Observe updates to Goal models. DataStore.observeQuery() will
+    // emit an initial QuerySnapshot with a list of Goal models in the local store,
     // and will emit subsequent snapshots as updates are made
     //
     // each time a snapshot is received, the following will happen:
     // _isLoading is set to false if it is not already false
-    // _todos is set to the value in the latest snapshot
-    _subscription = Amplify.DataStore.observeQuery(Todo.classType)
-        .listen((QuerySnapshot<Todo> snapshot) {
+    // _goals is set to the value in the latest snapshot
+    _subscription = Amplify.DataStore.observeQuery(Goal.classType)
+        .listen((QuerySnapshot<Goal> snapshot) {
       if (mounted) {
         setState(() {
           if (_isLoading) _isLoading = false;
-          _todos = snapshot.items;
+          _goals = snapshot.items;
         });
       }
     });
-  }
-
-  Future<void> requestPermission() async {
-    await Permission.location.request();
   }
 
   Future<void> _configureAmplify() async {
@@ -105,12 +99,12 @@ class _TodosPageState extends State<TodosPage> {
       // body: const Center(child: CircularProgressIndicator()),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : TodosList(todos: _todos),
+          : GoalsList(goals: _goals),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddTodoForm()),
+            MaterialPageRoute(builder: (context) => const AddGoalForm()),
           );
         },
         tooltip: 'Add Goal',
@@ -123,20 +117,20 @@ class _TodosPageState extends State<TodosPage> {
   }
 }
 
-class AddTodoForm extends StatefulWidget {
-  const AddTodoForm({Key? key}) : super(key: key);
+class AddGoalForm extends StatefulWidget {
+  const AddGoalForm({Key? key}) : super(key: key);
 
   @override
-  State<AddTodoForm> createState() => _AddTodoFormState();
+  State<AddGoalForm> createState() => _AddGoalFormState();
 }
 
-class _AddTodoFormState extends State<AddTodoForm> {
+class _AddGoalFormState extends State<AddGoalForm> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _goalDurationController = TextEditingController();
   final _addressController = TextEditingController();
 
-  Future<void> _saveTodo() async {
+  Future<void> _saveGoal() async {
     // get the current text field contents
     final name = _nameController.text;
     final description = _descriptionController.text;
@@ -144,9 +138,9 @@ class _AddTodoFormState extends State<AddTodoForm> {
     final location = double.parse(_addressController
         .text); //TODO: function to extract latitude and longitude
 
-    // create a new Todo from the form values
-    // `isComplete` is also required, but should start false in a new Todo
-    final newTodo = Todo(
+    // create a new Goal from the form values
+    // `isComplete` is also required, but should start false in a new Goal
+    final newGoal = Goal(
       name: name,
       description: description.isNotEmpty ? description : null,
       goalDuration: goalDuration,
@@ -159,12 +153,12 @@ class _AddTodoFormState extends State<AddTodoForm> {
     try {
       // to write data to DataStore, we simply pass an instance of a model to
       // Amplify.DataStore.save()
-      await Amplify.DataStore.save(newTodo);
+      await Amplify.DataStore.save(newGoal);
 
-      // after creating a new Todo, close the form
+      // after creating a new Goal, close the form
       Navigator.of(context).pop();
     } catch (e) {
-      print('An error occurred while saving Todo: $e');
+      print('An error occurred while saving Goal: $e');
     }
   }
 
@@ -214,7 +208,7 @@ class _AddTodoFormState extends State<AddTodoForm> {
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
               ElevatedButton(
-                onPressed: _saveTodo,
+                onPressed: _saveGoal,
                 child: const Text('Save'),
               )
             ],

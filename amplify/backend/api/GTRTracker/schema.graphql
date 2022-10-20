@@ -1,0 +1,16 @@
+enum Location {
+  LATITUDE
+  LONGITUDE
+}
+
+type Goal @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  description: String
+  isComplete: Boolean!
+  goalDuration: Int!
+  currentDuration: Int!
+  latitude: Float!
+  longitude: Float!
+}
+ 

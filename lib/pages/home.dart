@@ -9,10 +9,13 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'package:gtrtracker/models/Todo.dart';
+import '../models/ModelProvider.dart';
 
 // amplify configuration and models that should have been generated for you
+import '../amplifyconfiguration.dart';
+
+// detailScreen from detailPage
+import '../pages/detailPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -33,9 +36,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  late StreamSubscription<QuerySnapshot<Todo>> _subscription;
+  late StreamSubscription<QuerySnapshot<Goal>> _subscription;
   bool _isLoading = true;
-  List<Todo> _todos = [];
+  List<Goal> _goals = [];
 
   Future<void> readFromDatabase() async {
     if (Amplify.isConfigured) {
@@ -51,12 +54,12 @@ class _HomePageState extends State<HomePage> {
     } on AmplifyException catch (e) {
       throw AmplifyException(e.message);
     }
-    _subscription = Amplify.DataStore.observeQuery(Todo.classType)
-        .listen((QuerySnapshot<Todo> snapshot) {
+    _subscription = Amplify.DataStore.observeQuery(Goal.classType)
+        .listen((QuerySnapshot<Goal> snapshot) {
       if (mounted) {
         setState(() {
           if (_isLoading) _isLoading = false;
-          _todos = snapshot.items;
+          _goals = snapshot.items;
         });
       }
     });
@@ -107,14 +110,14 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(8.0),
-                    itemCount: _todos.length,
+                    itemCount: _goals.length,
                     itemBuilder: (context, index) {
                       return Card(
                           child: ListTile(
                         shape: border,
                         trailing: Icon(Icons.more_vert),
                         title: Text(
-                          _todos[index].name,
+                          _goals[index].name,
                           textScaleFactor: 1.5,
                           style: GoogleFonts.roboto(
                               fontSize: 13, fontWeight: FontWeight.w500),
@@ -124,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  DetailScreen(goal: _todos[index]),
+                                  detailScreen(goal: _goals[index]),
                             ),
                           );
                         },
