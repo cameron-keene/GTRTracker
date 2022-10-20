@@ -46,6 +46,7 @@ dependencies:
   flutter_foreground_task: ^3.8.2
   google_maps_flutter: ^2.2.1
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
