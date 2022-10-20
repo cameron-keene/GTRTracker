@@ -1,0 +1,6 @@
+{
+  "AppSyncApiName": "GTRTracker",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthModeLastUpdated": "2022-09-21T01:23:42.383Z"
+}

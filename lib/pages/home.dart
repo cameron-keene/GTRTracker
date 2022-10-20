@@ -1,4 +1,3 @@
-// dart async library we will refer to when setting up real time updates
 import 'dart:async';
 import 'dart:collection';
 
@@ -9,33 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:gtrtracker/goalClass/Goal.dart';
+import '../models/ModelProvider.dart';
 
 // amplify configuration and models that should have been generated for you
-import 'amplifyconfiguration.dart';
-import 'models/ModelProvider.dart';
-import 'pages/analysis.dart';
-import './pages/goalPage.dart';
-import './pages/detailPage.dart';
+import '../amplifyconfiguration.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Amplified Goal',
-      home: NavBar(),
-    );
-  }
-}
+// detailScreen from detailPage
+import '../pages/detailPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -156,105 +136,5 @@ class _HomePageState extends State<HomePage> {
                   ),
                 )
               ])));
-  }
-}
-
-class NavBar extends StatefulWidget {
-  const NavBar({Key? key}) : super(key: key);
-
-  @override
-  _NavBarState createState() => _NavBarState();
-}
-
-class _NavBarState extends State<NavBar> {
-  int pageIndex = 0;
-
-  //array to connect pages to navbar
-  final pages = [const HomePage(), const GoalsPage(), const AnalysisPage()];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      //styling
-      backgroundColor: const Color(0xffC4DFCB),
-      body: pages[pageIndex],
-      bottomNavigationBar: Container(
-        height: 60,
-        decoration:
-            BoxDecoration(color: Color.fromARGB(255, 27, 27, 27), boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 12,
-            spreadRadius: 2,
-            offset: const Offset(2, -2),
-          ),
-        ]),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 0;
-                });
-              },
-              //home page
-              icon: pageIndex == 0
-                  ? const Icon(
-                      Icons.home_filled,
-                      color: Color.fromARGB(255, 43, 121, 194),
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.home_outlined,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-            ),
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 1;
-                });
-              },
-              //goal page
-              icon: pageIndex == 1
-                  ? const Icon(
-                      Icons.task_alt_rounded,
-                      color: Color.fromARGB(255, 43, 121, 194),
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.task_alt_outlined,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-            ),
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 2;
-                });
-              },
-              //analysis page
-              icon: pageIndex == 2
-                  ? const Icon(
-                      Icons.timeline_rounded,
-                      color: Color.fromARGB(255, 43, 121, 194),
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.timeline_outlined,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

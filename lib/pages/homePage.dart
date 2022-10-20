@@ -1,4 +1,3 @@
-// dart async library we will refer to when setting up real time updates
 import 'dart:async';
 import 'dart:collection';
 
@@ -9,30 +8,139 @@ import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:gtrtracker/goalClass/Goal.dart';
 
-// amplify configuration and models that should have been generated for you
-import 'amplifyconfiguration.dart';
-import 'models/ModelProvider.dart';
-import 'pages/analysis.dart';
-import './pages/goalPage.dart';
-import './pages/detailPage.dart';
+import 'package:gtrtracker/amplifyconfiguration.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:gtrtracker/models/ModelProvider.dart';
+
+class DetailScreen extends StatefulWidget {
+  final Goal goal;
+
+  const DetailScreen({super.key, required this.goal});
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class _DetailScreenState extends State<DetailScreen> {
+  late GoogleMapController mapController;
+  Set<Circle> circles = Set.from([
+    Circle(
+      circleId: CircleId("geofence"),
+      center: LatLng(29.648198545235758, -82.34372474439299),
+      radius: 65,
+      fillColor: Color.fromARGB(92, 43, 121, 194),
+      strokeColor: Color.fromARGB(122, 43, 121, 194),
+    )
+  ]);
+  Set<Marker> _markers = {};
+
+  final LatLng _center = const LatLng(29.648198545235758, -82.34372474439299);
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Amplified Goal',
-      home: NavBar(),
+    // Use the Goal to create the UI.
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 27, 27, 27),
+        title: Text(widget.goal.name,
+            style: TextStyle(
+                color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
+      ),
+      backgroundColor: Color.fromARGB(255, 27, 27, 27),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Description',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
+
+          //goal description
+          Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.goal.description ?? "",
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.roboto(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 20,
+                    ),
+                  ))),
+
+          Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Progress',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
+
+          //progress bar
+          Center(
+              child: Container(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+            color: Color.fromARGB(132, 56, 56, 56),
+            child: LinearProgressIndicator(
+              minHeight: 7,
+              backgroundColor: Color.fromARGB(255, 255, 255, 255),
+              valueColor: new AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 43, 121, 194)),
+              value: 0.4,
+            ),
+          )), //update with current hours towards goal
+          Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Goal Location',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
+
+          Expanded(
+              child: Padding(
+            padding: EdgeInsets.all(7.0),
+            child: GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 18,
+              ),
+              circles: circles,
+            ),
+          )),
+        ],
+      ),
     );
   }
 }
@@ -147,7 +255,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  detailScreen(goal: _goals[index]),
+                                  DetailScreen(goal: _goals[index]),
                             ),
                           );
                         },
@@ -156,105 +264,5 @@ class _HomePageState extends State<HomePage> {
                   ),
                 )
               ])));
-  }
-}
-
-class NavBar extends StatefulWidget {
-  const NavBar({Key? key}) : super(key: key);
-
-  @override
-  _NavBarState createState() => _NavBarState();
-}
-
-class _NavBarState extends State<NavBar> {
-  int pageIndex = 0;
-
-  //array to connect pages to navbar
-  final pages = [const HomePage(), const GoalsPage(), const AnalysisPage()];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      //styling
-      backgroundColor: const Color(0xffC4DFCB),
-      body: pages[pageIndex],
-      bottomNavigationBar: Container(
-        height: 60,
-        decoration:
-            BoxDecoration(color: Color.fromARGB(255, 27, 27, 27), boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 12,
-            spreadRadius: 2,
-            offset: const Offset(2, -2),
-          ),
-        ]),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 0;
-                });
-              },
-              //home page
-              icon: pageIndex == 0
-                  ? const Icon(
-                      Icons.home_filled,
-                      color: Color.fromARGB(255, 43, 121, 194),
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.home_outlined,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-            ),
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 1;
-                });
-              },
-              //goal page
-              icon: pageIndex == 1
-                  ? const Icon(
-                      Icons.task_alt_rounded,
-                      color: Color.fromARGB(255, 43, 121, 194),
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.task_alt_outlined,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-            ),
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 2;
-                });
-              },
-              //analysis page
-              icon: pageIndex == 2
-                  ? const Icon(
-                      Icons.timeline_rounded,
-                      color: Color.fromARGB(255, 43, 121, 194),
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.timeline_outlined,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
