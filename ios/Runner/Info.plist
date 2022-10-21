@@ -56,5 +56,7 @@
 		<string>fetch</string>
 		<string>location</string>
 	</array>
+	<key>NSMotionUsageDescription</key>
+	<string>Used to recognize user activity information.</string>
 </dict>
 </plist>
