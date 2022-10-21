@@ -13,8 +13,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtrtracker/goalClass/Goal.dart';
 
+import './pages/goalPage.dart';
+
 // amplify configuration and models that should have been generated for you
-import 'amplifyconfiguration.dar
+import 'amplifyconfiguration.dart';
 import 'models/ModelProvider.dart' hide Location;
 
 // page import
@@ -74,7 +76,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     debugPrint("starting geofence.....");
     widget.testGeo.geofenceInitial();
-
   }
 
   late StreamSubscription<QuerySnapshot<Goal>> _subscription;
@@ -130,7 +131,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       debugPrint("paused");
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -312,7 +312,6 @@ class AnalysisPage extends StatelessWidget {
             Divider(color: Color.fromARGB(255, 255, 255, 255)),
           ],
         ));
-
   }
 }
 
@@ -328,7 +327,6 @@ class _NavBarState extends State<NavBar> {
 
   //array to connect pages to navbar
   final pages = [HomePage(), const GoalsPage(), const AnalysisPage()];
-
 
   @override
   Widget build(BuildContext context) {

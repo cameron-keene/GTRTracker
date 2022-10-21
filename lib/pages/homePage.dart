@@ -15,135 +15,7 @@ import 'package:gtrtracker/amplifyconfiguration.dart';
 
 import 'package:gtrtracker/models/ModelProvider.dart';
 
-class DetailScreen extends StatefulWidget {
-  final Goal goal;
-
-  const DetailScreen({super.key, required this.goal});
-
-  @override
-  State<DetailScreen> createState() => _DetailScreenState();
-}
-
-class _DetailScreenState extends State<DetailScreen> {
-  late GoogleMapController mapController;
-  Set<Circle> circles = Set.from([
-    Circle(
-      circleId: CircleId("geofence"),
-      center: LatLng(29.648198545235758, -82.34372474439299),
-      radius: 65,
-      fillColor: Color.fromARGB(92, 43, 121, 194),
-      strokeColor: Color.fromARGB(122, 43, 121, 194),
-    )
-  ]);
-  Set<Marker> _markers = {};
-
-  final LatLng _center = const LatLng(29.648198545235758, -82.34372474439299);
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Use the Goal to create the UI.
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text(widget.goal.name,
-            style: TextStyle(
-                color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
-      ),
-      backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Center(
-              child: Container(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Goal Description',
-                        style: GoogleFonts.roboto(
-                            color: Color.fromARGB(255, 43, 121, 194),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
-                      )))),
-
-          //goal description
-          Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.goal.description ?? "",
-                    textAlign: TextAlign.left,
-                    style: GoogleFonts.roboto(
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      fontSize: 20,
-                    ),
-                  ))),
-
-          Divider(color: Color.fromARGB(255, 255, 255, 255)),
-
-          Center(
-              child: Container(
-                  padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Goal Progress',
-                        style: GoogleFonts.roboto(
-                            color: Color.fromARGB(255, 43, 121, 194),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
-                      )))),
-
-          //progress bar
-          Center(
-              child: Container(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-            color: Color.fromARGB(132, 56, 56, 56),
-            child: LinearProgressIndicator(
-              minHeight: 7,
-              backgroundColor: Color.fromARGB(255, 255, 255, 255),
-              valueColor: new AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 43, 121, 194)),
-              value: 0.4,
-            ),
-          )), //update with current hours towards goal
-          Divider(color: Color.fromARGB(255, 255, 255, 255)),
-
-          Center(
-              child: Container(
-                  padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Goal Location',
-                        style: GoogleFonts.roboto(
-                            color: Color.fromARGB(255, 43, 121, 194),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
-                      )))),
-
-          Expanded(
-              child: Padding(
-            padding: EdgeInsets.all(7.0),
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 18,
-              ),
-              circles: circles,
-            ),
-          )),
-        ],
-      ),
-    );
-  }
-}
+import './detailPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -255,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  DetailScreen(goal: _goals[index]),
+                                  detailScreen(goal: _goals[index]),
                             ),
                           );
                         },
