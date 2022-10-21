@@ -13,6 +13,9 @@ import 'package:gtrtracker/amplifyconfiguration.dart';
 import 'package:gtrtracker/models/ModelProvider.dart';
 import 'package:gtrtracker/goalClass/Goal.dart';
 
+// need to hide the location package from the geocoding package
+import 'package:geocoding/geocoding.dart' as test;
+
 class GoalsPage extends StatefulWidget {
   const GoalsPage({Key? key}) : super(key: key);
 
@@ -134,21 +137,19 @@ class _AddGoalFormState extends State<AddGoalForm> {
     // get the current text field contents
     final name = _nameController.text;
     final description = _descriptionController.text;
-    final goalDuration = int.parse(_goalDurationController.text);
-    final location = double.parse(_addressController
-        .text); //TODO: function to extract latitude and longitude
+    final goalDuration = _goalDurationController.text; // int.parse
+    final location = _addressController.text; // double.parse
 
     // create a new Goal from the form values
     // `isComplete` is also required, but should start false in a new Goal
     final newGoal = Goal(
-      name: name,
-      description: description.isNotEmpty ? description : null,
-      goalDuration: goalDuration,
-      currentDuration: 0,
-      latitude: location, //TODO: change
-      longitude: location, //TODO: change
-      isComplete: false,
-    );
+        name: "test goal 1",
+        description: "test goal 1 description",
+        isComplete: true,
+        goalDuration: 1020,
+        currentDuration: 1020,
+        latitude: 123.45,
+        longitude: 123.45);
 
     try {
       // to write data to DataStore, we simply pass an instance of a model to
@@ -199,13 +200,25 @@ class _AddGoalFormState extends State<AddGoalForm> {
                     fillColor: Colors.white,
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
-              TextFormField(
+              // TextFormField(
+              //   controller: _addressController,
+              //   decoration: const InputDecoration(
+              //       filled: true,
+              //       labelText: 'address',
+              //       fillColor: Colors.white,
+              //       labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+              // ),
+              TextField(
                 controller: _addressController,
-                decoration: const InputDecoration(
-                    filled: true,
-                    labelText: 'address',
-                    fillColor: Colors.white,
-                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                onSubmitted: (String value) async {
+                  List<test.Location> locations =
+                      await test.locationFromAddress(value);
+                  String latitude = locations.elementAt(0).latitude.toString();
+                  String longitude =
+                      locations.elementAt(0).longitude.toString();
+                  print("latitude: $latitude, longitude: $longitude");
+                  print("starting geoFencing Service");
+                },
               ),
               ElevatedButton(
                 onPressed: _saveGoal,
