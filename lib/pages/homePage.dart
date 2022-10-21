@@ -1,3 +1,4 @@
+// dart async library we will refer to when setting up real time updates
 import 'dart:async';
 import 'dart:collection';
 
@@ -10,30 +11,47 @@ import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gtrtracker/goalClass/Goal.dart';
 
-import 'package:gtrtracker/amplifyconfiguration.dart';
+import './goalPage.dart';
 
-import 'package:gtrtracker/models/ModelProvider.dart';
+// amplify configuration and models that should have been generated for you
+import '../amplifyconfiguration.dart';
+import '../models/ModelProvider.dart' hide Location;
 
+// page import
 import './detailPage.dart';
 
+// test imports
+// import 'dart:async';
+import 'dart:isolate';
+
+import 'package:geofence_service/geofence_service.dart';
+
+import './analysisPage.dart';
+
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
+  final geofence testGeo = geofence();
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   final _dataStorePlugin =
       AmplifyDataStore(modelProvider: ModelProvider.instance);
   final AmplifyAPI _apiPlugin = AmplifyAPI();
+
+  @override
   void initState() {
     // kick off app initialization
     readFromDatabase();
-
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    debugPrint("starting geofence.....");
+    widget.testGeo.geofenceInitial();
   }
 
   late StreamSubscription<QuerySnapshot<Goal>> _subscription;
@@ -66,7 +84,66 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    widget.testGeo._activityStreamController.close();
+    widget.testGeo._geofenceStreamController.close();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      debugPrint("active");
+    } else if (state == AppLifecycleState.inactive) {
+      debugPrint("inactive");
+      widget.testGeo.geofenceInitial();
+    } else if (state == AppLifecycleState.detached) {
+      debugPrint("detached");
+      widget.testGeo.geofenceInitial();
+    } else if (state == AppLifecycleState.paused) {
+      debugPrint("paused");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      home: WillStartForegroundTask(
+        onWillStart: () async {
+          debugPrint("onWillStart Notification ----------");
+
+          // You can add a foreground task start condition.
+          return widget.testGeo._geofenceService.isRunningService;
+        },
+        androidNotificationOptions: AndroidNotificationOptions(
+          channelId: 'geofence_service_notification_channel',
+          channelName: 'Geofence Service Notification',
+          channelDescription:
+              'This notification appears when the geofence service is running in the background.',
+          channelImportance: NotificationChannelImportance.LOW,
+          priority: NotificationPriority.LOW,
+          isSticky: false,
+        ),
+        iosNotificationOptions: const IOSNotificationOptions(),
+        notificationTitle: 'Geofence Service is running',
+        notificationText: 'Tap to return to the app',
+        foregroundTaskOptions: const ForegroundTaskOptions(
+          interval: 5000,
+          autoRunOnBoot: false,
+          allowWifiLock: false,
+        ),
+        callback: startCallback,
+        child: Scaffold(
+          body: _buildContentView(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentView() {
     final border = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(15.0),
     );
@@ -108,7 +185,6 @@ class _HomePageState extends State<HomePage> {
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(8.0),
                     itemCount: _goals.length,
                     itemBuilder: (context, index) {
@@ -127,6 +203,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
+                                  //  ExampleApp(),
                                   detailScreen(goal: _goals[index]),
                             ),
                           );
@@ -136,5 +213,43 @@ class _HomePageState extends State<HomePage> {
                   ),
                 )
               ])));
+  }
+
+  Widget _buildActivityMonitor() {
+    return StreamBuilder<Activity>(
+      stream: widget.testGeo._activityStreamController.stream,
+      builder: (context, snapshot) {
+        final updatedDateTime = DateTime.now();
+        final content = snapshot.data?.toJson().toString() ?? '';
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('•\t\tActivity (updated: $updatedDateTime)'),
+            const SizedBox(height: 10.0),
+            Text(content),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildGeofenceMonitor() {
+    return StreamBuilder<Geofence>(
+      stream: widget.testGeo._geofenceStreamController.stream,
+      builder: (context, snapshot) {
+        final updatedDateTime = DateTime.now();
+        final content = snapshot.data?.toJson().toString() ?? '';
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('•\t\tGeofence (updated: $updatedDateTime)'),
+            const SizedBox(height: 10.0),
+            Text(content),
+          ],
+        );
+      },
+    );
   }
 }
