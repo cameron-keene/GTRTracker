@@ -200,16 +200,13 @@ class _AddGoalFormState extends State<AddGoalForm> {
                     fillColor: Colors.white,
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
-              // TextFormField(
-              //   controller: _addressController,
-              //   decoration: const InputDecoration(
-              //       filled: true,
-              //       labelText: 'address',
-              //       fillColor: Colors.white,
-              //       labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
-              // ),
               TextField(
                 controller: _addressController,
+                decoration: const InputDecoration(
+                    filled: true,
+                    labelText: 'address',
+                    fillColor: Colors.white,
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
                 onSubmitted: (String value) async {
                   List<test.Location> locations =
                       await test.locationFromAddress(value);
