@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'dart:core';
 
 // flutter and ui libraries
 import 'package:flutter/material.dart';
@@ -138,18 +140,27 @@ class _AddGoalFormState extends State<AddGoalForm> {
     final name = _nameController.text;
     final description = _descriptionController.text;
     final goalDuration = _goalDurationController.text; // int.parse
-    final location = _addressController.text; // double.parse
+    final location = _addressController.text;
+
+    double latitude;
+    double longitude;
+
+    List<test.Location> locations = await test.locationFromAddress(location);
+    latitude = locations.elementAt(0).latitude;
+    longitude = locations.elementAt(0).longitude;
+    print("latitude: $latitude, longitude: $longitude");
+    print("starting geoFencing Service");
 
     // create a new Goal from the form values
     // `isComplete` is also required, but should start false in a new Goal
     final newGoal = Goal(
-        name: "test goal 1",
-        description: "test goal 1 description",
-        isComplete: true,
-        goalDuration: 1020,
-        currentDuration: 1020,
-        latitude: 123.45,
-        longitude: 123.45);
+        name: name,
+        description: description,
+        isComplete: false,
+        goalDuration: int.parse(goalDuration),
+        currentDuration: 0,
+        latitude: latitude,
+        longitude: longitude);
 
     try {
       // to write data to DataStore, we simply pass an instance of a model to
@@ -207,15 +218,6 @@ class _AddGoalFormState extends State<AddGoalForm> {
                     labelText: 'address',
                     fillColor: Colors.white,
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
-                onSubmitted: (String value) async {
-                  List<test.Location> locations =
-                      await test.locationFromAddress(value);
-                  String latitude = locations.elementAt(0).latitude.toString();
-                  String longitude =
-                      locations.elementAt(0).longitude.toString();
-                  print("latitude: $latitude, longitude: $longitude");
-                  print("starting geoFencing Service");
-                },
               ),
               ElevatedButton(
                 onPressed: _saveGoal,
