@@ -1,0 +1,197 @@
+PODS:
+  - Amplify (1.28.0):
+    - Amplify/Default (= 1.28.0)
+  - Amplify/Default (1.28.0)
+  - amplify_api_ios (0.0.1):
+    - Amplify (= 1.28.0)
+    - amplify_core
+    - AmplifyPlugins/AWSAPIPlugin (= 1.28.0)
+    - Flutter
+    - SwiftFormat/CLI
+    - SwiftLint (= 0.48.0)
+  - amplify_auth_cognito_ios (0.0.1):
+    - Amplify (= 1.28.0)
+    - amplify_core
+    - AmplifyPlugins/AWSCognitoAuthPlugin (= 1.28.0)
+    - Flutter
+    - ObjectMapper
+  - amplify_core (0.0.1):
+    - Flutter
+    - SwiftFormat/CLI
+    - SwiftLint (= 0.48.0)
+  - amplify_datastore (0.0.1):
+    - Amplify (= 1.28.0)
+    - amplify_core
+    - AmplifyPlugins/AWSDataStorePlugin (= 1.28.0)
+    - Flutter
+  - amplify_flutter_ios (0.0.1):
+    - Amplify (= 1.28.0)
+    - amplify_core
+    - AmplifyPlugins/AWSCognitoAuthPlugin (= 1.28.0)
+    - AWSPluginsCore (= 1.28.0)
+    - Flutter
+    - SwiftFormat/CLI
+    - SwiftLint (= 0.48.0)
+  - AmplifyPlugins/AWSAPIPlugin (1.28.0):
+    - AppSyncRealTimeClient (~> 2.0)
+    - AWSCore (~> 2.27.0)
+    - AWSPluginsCore (= 1.28.0)
+  - AmplifyPlugins/AWSCognitoAuthPlugin (1.28.0):
+    - AWSAuthCore (~> 2.27.0)
+    - AWSCognitoIdentityProvider (~> 2.27.0)
+    - AWSCognitoIdentityProviderASF (~> 2.27.0)
+    - AWSCore (~> 2.27.0)
+    - AWSMobileClient (~> 2.27.0)
+    - AWSPluginsCore (= 1.28.0)
+  - AmplifyPlugins/AWSDataStorePlugin (1.28.0):
+    - AWSCore (~> 2.27.0)
+    - AWSPluginsCore (= 1.28.0)
+    - SQLite.swift (= 0.13.2)
+  - AppSyncRealTimeClient (2.1.1):
+    - Starscream (~> 4.0.4)
+  - AWSAuthCore (2.27.15):
+    - AWSCore (= 2.27.15)
+  - AWSCognitoIdentityProvider (2.27.15):
+    - AWSCognitoIdentityProviderASF (= 2.27.15)
+    - AWSCore (= 2.27.15)
+  - AWSCognitoIdentityProviderASF (2.27.15):
+    - AWSCore (= 2.27.15)
+  - AWSCore (2.27.15)
+  - AWSMobileClient (2.27.15):
+    - AWSAuthCore (= 2.27.15)
+    - AWSCognitoIdentityProvider (= 2.27.15)
+    - AWSCognitoIdentityProviderASF (= 2.27.15)
+    - AWSCore (= 2.27.15)
+  - AWSPluginsCore (1.28.0):
+    - Amplify (= 1.28.0)
+    - AWSCore (~> 2.27.0)
+  - fl_location (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_activity_recognition (0.0.1):
+    - Flutter
+  - flutter_foreground_task (0.0.1):
+    - Flutter
+  - geocoding (1.0.5):
+    - Flutter
+  - geofence_service (0.0.1):
+    - Flutter
+  - google_maps_flutter_ios (0.0.1):
+    - Flutter
+    - GoogleMaps
+  - GoogleMaps (7.1.0):
+    - GoogleMaps/Maps (= 7.1.0)
+  - GoogleMaps/Base (7.1.0)
+  - GoogleMaps/Maps (7.1.0):
+    - GoogleMaps/Base
+  - ObjectMapper (4.2.0)
+  - path_provider_ios (0.0.1):
+    - Flutter
+  - shared_preferences_ios (0.0.1):
+    - Flutter
+  - SQLite.swift (0.13.2):
+    - SQLite.swift/standard (= 0.13.2)
+  - SQLite.swift/standard (0.13.2)
+  - Starscream (4.0.4)
+  - SwiftFormat/CLI (0.50.3)
+  - SwiftLint (0.48.0)
+
+DEPENDENCIES:
+  - amplify_api_ios (from `.symlinks/plugins/amplify_api_ios/ios`)
+  - amplify_auth_cognito_ios (from `.symlinks/plugins/amplify_auth_cognito_ios/ios`)
+  - amplify_core (from `.symlinks/plugins/amplify_core/ios`)
+  - amplify_datastore (from `.symlinks/plugins/amplify_datastore/ios`)
+  - amplify_flutter_ios (from `.symlinks/plugins/amplify_flutter_ios/ios`)
+  - fl_location (from `.symlinks/plugins/fl_location/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_activity_recognition (from `.symlinks/plugins/flutter_activity_recognition/ios`)
+  - flutter_foreground_task (from `.symlinks/plugins/flutter_foreground_task/ios`)
+  - geocoding (from `.symlinks/plugins/geocoding/ios`)
+  - geofence_service (from `.symlinks/plugins/geofence_service/ios`)
+  - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
+  - GoogleMaps (= 7.1.0)
+  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+  - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Amplify
+    - AmplifyPlugins
+    - AppSyncRealTimeClient
+    - AWSAuthCore
+    - AWSCognitoIdentityProvider
+    - AWSCognitoIdentityProviderASF
+    - AWSCore
+    - AWSMobileClient
+    - AWSPluginsCore
+    - GoogleMaps
+    - ObjectMapper
+    - SQLite.swift
+    - Starscream
+    - SwiftFormat
+    - SwiftLint
+
+EXTERNAL SOURCES:
+  amplify_api_ios:
+    :path: ".symlinks/plugins/amplify_api_ios/ios"
+  amplify_auth_cognito_ios:
+    :path: ".symlinks/plugins/amplify_auth_cognito_ios/ios"
+  amplify_core:
+    :path: ".symlinks/plugins/amplify_core/ios"
+  amplify_datastore:
+    :path: ".symlinks/plugins/amplify_datastore/ios"
+  amplify_flutter_ios:
+    :path: ".symlinks/plugins/amplify_flutter_ios/ios"
+  fl_location:
+    :path: ".symlinks/plugins/fl_location/ios"
+  Flutter:
+    :path: Flutter
+  flutter_activity_recognition:
+    :path: ".symlinks/plugins/flutter_activity_recognition/ios"
+  flutter_foreground_task:
+    :path: ".symlinks/plugins/flutter_foreground_task/ios"
+  geocoding:
+    :path: ".symlinks/plugins/geocoding/ios"
+  geofence_service:
+    :path: ".symlinks/plugins/geofence_service/ios"
+  google_maps_flutter_ios:
+    :path: ".symlinks/plugins/google_maps_flutter_ios/ios"
+  path_provider_ios:
+    :path: ".symlinks/plugins/path_provider_ios/ios"
+  shared_preferences_ios:
+    :path: ".symlinks/plugins/shared_preferences_ios/ios"
+
+SPEC CHECKSUMS:
+  Amplify: dfa12fad1609b1388d0b2fb6f99b3140cd942d09
+  amplify_api_ios: eadebd57661eed0430302700037b401a943fd686
+  amplify_auth_cognito_ios: a2a37adcedf38b8b3e5a2b564ff0432d875654ad
+  amplify_core: 0876b2fbbcec7619f5b58b20c59ecc0118f65a47
+  amplify_datastore: b996b3713c22fe7cdd4cb7ece47ac2346418e7a0
+  amplify_flutter_ios: 268040e5c74a116ee8d532c33ac5b4b405692b1a
+  AmplifyPlugins: 1bac66d0349fa307008f6f7711b09d0f80e78c30
+  AppSyncRealTimeClient: 937360221f2b664c4c33ae142a60643e64f480cd
+  AWSAuthCore: 0bac0e67c28d620c8f823c88bd15d552544e801a
+  AWSCognitoIdentityProvider: a8d244d0cdfeff425fe20a2fb49b7e9cb89c4748
+  AWSCognitoIdentityProviderASF: 5dccf24b43c287eb1949e83cefccb6c25cdc04b7
+  AWSCore: c67277201b6aca10e4cf24638eadaa67c85ebf03
+  AWSMobileClient: 6f60d1fb6373e21aaada443dd4d4bf087158614d
+  AWSPluginsCore: 7f0f984d787a4fe79d3d52c3d34e1779d1fc9bb8
+  fl_location: 68b4a6c4aad2a453493ff66f196e0748280cf43e
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_activity_recognition: 5c3b026997742b01e82424ef257db9640822ad77
+  flutter_foreground_task: 21ef182ab0a29a3005cc72cd70e5f45cb7f7f817
+  geocoding: 32cfcdb16d38d907caaba65e2e42ad10d38bee58
+  geofence_service: e007ddec3cf8b85531e8f7b202c1ceabca669d64
+  google_maps_flutter_ios: 66201f392bf62d500f07670a30488a247b9bb5b9
+  GoogleMaps: bc56ffb0324e345a2d91bac1a64a920f9c8f1b20
+  ObjectMapper: 1eb41f610210777375fa806bf161dc39fb832b81
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
+  shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
+  SQLite.swift: 4fc2be46c36392e3b87afe6fe7f1801c1daa07ef
+  Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
+  SwiftFormat: 61cda3819dc3a7d69795ce0430e1e1d53c4a4fb2
+  SwiftLint: 284cea64b6187c5d6bd83e9a548a64104d546447
+
+PODFILE CHECKSUM: 1d19a0a71383a5311469a7420121e73f58d27913
+
+COCOAPODS: 1.11.3
