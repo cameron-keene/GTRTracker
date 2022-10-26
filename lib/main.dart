@@ -402,7 +402,7 @@ class MyTaskHandler extends TaskHandler {
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     debugPrint("on event - event count task running in background");
-    testGeo.geofenceInitial();
+    // testGeo.geofenceInitial();
     // call the flutter geofence_service update.
 
     // Send data to the main isolate.
@@ -470,7 +470,31 @@ class geofence {
     await Amplify.DataStore.save(item);
   }
 
-  Future<void> updateGoalDuration() async {}
+  Future<void> updateGoalDuration(String goalID, int duration) async {
+    List<Goal> goalList = [];
+    try {
+      // get the goal and the goal duration
+      goalList = await Amplify.DataStore.query(Goal.classType,
+          where: Goal.ID.eq(goalID));
+    } catch (e) {
+      debugPrint("error: " + e.toString());
+    }
+    debugPrint("first: " + goalList.first.toString());
+    final goal = goalList.first;
+    double newDuration = goal.currentDuration + duration.toDouble();
+    // UPDATE GOAL WITH NEW DURATION
+    final updatedGoal = goal.copyWith(
+        name: goal.name,
+        description: goal.description,
+        isComplete: goal.isComplete,
+        goalDuration: goal.goalDuration,
+        currentDuration: newDuration,
+        latitude: goal.latitude,
+        longitude: goal.longitude,
+        Activities: goal.Activities);
+    // SAVE THE NEW GOAL
+    await Amplify.DataStore.save(updatedGoal);
+  }
 
   Future<void> calcDuration(
       DateTime enter, DateTime exit, String goalID) async {
@@ -481,11 +505,11 @@ class geofence {
     Duration exitDur = Duration(hours: exit.hour, minutes: exit.minute);
     Duration result = exitDur - enterDur;
     // debugPrint("result: " + result.inMinutes.toString());
+    createActivity(goalID, enter, result.inMinutes);
+    updateGoalDuration(goalID, result.inMinutes);
     // reset the enter/exit time
     enter = DateTime(0);
     exit = DateTime(0);
-    createActivity(goalID, enter, result.inMinutes);
-    updateGoalDuration();
   }
 
   // This function is to be called when the geofence status is changed.
