@@ -458,31 +458,34 @@ class geofence {
   // flag to detect first entry
   bool wasEntered = false;
 
+  late DateTime enter;
+  late DateTime exit;
+
   Future<void> createActivity(
-      String _goalID, DateTime _timestamp, String _geofenceStatus) async {
-    // _geofenceStatus can either be ENTER or EXIT
+      String _goalID, DateTime _timestamp, int _duration) async {
     final item = GeoActivity(
         goalID: _goalID,
         activityTime: TemporalDateTime(_timestamp),
-        geofenceStatus: _geofenceStatus);
+        duration: _duration.toDouble());
     await Amplify.DataStore.save(item);
   }
 
-  Future<void> calcDuration() async {
-    debugPrint("calc Duration.............");
-    // get the first and second most recent
-    List<GeoActivity> Activities = [];
-    try {
-      Activities = await Amplify.DataStore.query(GeoActivity.classType);
-    } catch (e) {
-      debugPrint("count not query GeoActivity datastore: " + e.toString());
-    }
+  Future<void> updateGoalDuration() async {}
 
-    var exit = Activities[1].activityTime?.getDateTimeInUtc();
-    var enter = Activities[0].activityTime?.getDateTimeInUtc();
-
-    debugPrint("first goal: " + enter.toString());
-    debugPrint("second goal: " + exit.toString());
+  Future<void> calcDuration(
+      DateTime enter, DateTime exit, String goalID) async {
+    // convert the DateTime to the duration
+    // only care about the hours and minutes
+    // convert everything to hours.
+    Duration enterDur = Duration(hours: enter.hour, minutes: enter.minute);
+    Duration exitDur = Duration(hours: exit.hour, minutes: exit.minute);
+    Duration result = exitDur - enterDur;
+    // debugPrint("result: " + result.inMinutes.toString());
+    // reset the enter/exit time
+    enter = DateTime(0);
+    exit = DateTime(0);
+    createActivity(goalID, enter, result.inMinutes);
+    updateGoalDuration();
   }
 
   // This function is to be called when the geofence status is changed.
@@ -498,12 +501,15 @@ class geofence {
     if (geofenceStatus == GeofenceStatus.ENTER && !wasEntered) {
       wasEntered = !wasEntered;
       debugPrint("geofence entered, wait for exit");
-      createActivity(geofence.id, geofence.timestamp!, 'ENTER');
+      debugPrint('geofence timestamp enter: ${geofence.timestamp}');
+      enter = geofence.timestamp!;
+      // createActivity(geofence.id, geofence.timestamp!, 'ENTER');
     } else if (geofenceStatus == GeofenceStatus.EXIT && wasEntered) {
       debugPrint('geofence: ${geofence.toJson()}');
+      debugPrint('geofence timestamp exit: ${geofence.timestamp}');
       debugPrint("geofence exited need to create activity");
-      createActivity(geofence.id, geofence.timestamp!, 'EXIT');
-      calcDuration();
+      exit = geofence.timestamp!;
+      calcDuration(enter, exit, geofence.id);
       wasEntered = !wasEntered;
       // TODO: since exit need to query previous enter then calc duration.
     }
