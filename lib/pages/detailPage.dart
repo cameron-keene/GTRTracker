@@ -121,17 +121,21 @@ class _detailScreenState extends State<detailScreen> {
                               fontWeight: FontWeight.bold),
                         )))),
             // geofenceFeature(),
-            TextField(
-              controller: widget.locationController,
-              onSubmitted: (String value) async {
-                List<test.Location> locations =
-                    await test.locationFromAddress(value);
-                String latitude = locations.elementAt(0).latitude.toString();
-                String longitude = locations.elementAt(0).longitude.toString();
-                print("latitude: $latitude, longitude: $longitude");
-                print("starting geoFencing Service");
-              },
-            ),
+            //goal description
+            Padding(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      widget.goal.latitude.toString() +
+                          " " +
+                          widget.goal.longitude.toString(),
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.roboto(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontSize: 20,
+                      ),
+                    ))),
           ],
         ),
       ),

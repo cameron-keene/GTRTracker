@@ -157,7 +157,7 @@ class _AddGoalFormState extends State<AddGoalForm> {
         name: name,
         description: description,
         isComplete: false,
-        goalDuration: int.parse(goalDuration),
+        goalDuration: double.parse(goalDuration),
         currentDuration: 0,
         latitude: latitude,
         longitude: longitude);
