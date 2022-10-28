@@ -5,16 +5,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 // amplify packages we will need to use
-
-import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_datastore/amplify_datastore.dart';
-import 'package:amplify_api/amplify_api.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 // amplify configuration and models that should have been generated for you
-import '../amplifyconfiguration.dart';
 import '../models/ModelProvider.dart';
-
+import 'locationWidget.dart';
 import '../models/Goal.dart';
 
 // test imports
@@ -120,6 +116,7 @@ class _detailScreenState extends State<detailScreen> {
                               fontSize: 25,
                               fontWeight: FontWeight.bold),
                         )))),
+            const locationWidget(),
             // geofenceFeature(),
             TextField(
               controller: widget.locationController,
