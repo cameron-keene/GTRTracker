@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 // amplify packages we will need to use
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 // amplify configuration and models that should have been generated for you
 import '../models/ModelProvider.dart';
@@ -15,7 +14,6 @@ import '../models/Goal.dart';
 
 // test imports
 // import 'dart:async';
-import 'dart:isolate';
 
 // need to hide the location package from the geocoding package
 import 'package:geocoding/geocoding.dart' as test;
