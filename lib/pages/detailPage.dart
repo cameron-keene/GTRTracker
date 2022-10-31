@@ -103,7 +103,8 @@ class _detailScreenState extends State<detailScreen> {
                 backgroundColor: Color.fromARGB(255, 255, 255, 255),
                 valueColor: new AlwaysStoppedAnimation<Color>(
                     Color.fromARGB(255, 43, 121, 194)),
-                value: 0.4,
+                value: getPercentage(
+                    widget.goal), // update this with the percentage
               ),
             )), //update with current hours towards goal
             Divider(color: Color.fromARGB(255, 255, 255, 255)),
@@ -140,5 +141,11 @@ class _detailScreenState extends State<detailScreen> {
         ),
       ),
     );
+  }
+
+  double getPercentage(Goal currentGoal) {
+    double percentage = currentGoal.currentDuration / currentGoal.goalDuration;
+    debugPrint("percentage is: " + percentage.toString());
+    return percentage;
   }
 }

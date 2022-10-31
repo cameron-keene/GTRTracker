@@ -466,7 +466,7 @@ class geofence {
     final item = GeoActivity(
         goalID: _goalID,
         activityTime: TemporalDateTime(_timestamp),
-        duration: _duration.toDouble());
+        duration: _duration.toInt());
     await Amplify.DataStore.save(item);
   }
 
@@ -481,7 +481,7 @@ class geofence {
     }
     debugPrint("first: " + goalList.first.toString());
     final goal = goalList.first;
-    double newDuration = goal.currentDuration + duration.toDouble();
+    int newDuration = goal.currentDuration + duration.toInt();
     // UPDATE GOAL WITH NEW DURATION
     final updatedGoal = goal.copyWith(
         name: goal.name,
