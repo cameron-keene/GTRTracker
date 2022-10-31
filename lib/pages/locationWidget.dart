@@ -8,7 +8,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtrtracker/models/Location.dart';
 
 class locationWidget extends StatefulWidget {
-  final LatLng _center = LatLng(27.00000, 27.0000000);
+  final double latitude;
+  final double longitude;
+
+  locationWidget(this.latitude, this.longitude);
 
   @override
   State<locationWidget> createState() => _locationWidgetState();
@@ -30,7 +33,7 @@ class _locationWidgetState extends State<locationWidget> {
           child: GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(
-              target: widget._center,
+              target: LatLng(widget.latitude, widget.longitude),
               zoom: 18,
             ),
           ),

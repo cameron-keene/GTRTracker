@@ -114,7 +114,7 @@ class _detailScreenState extends State<detailScreen> {
                               fontSize: 25,
                               fontWeight: FontWeight.bold),
                         )))),
-            locationWidget(),
+            locationWidget(widget.goal.latitude, widget.goal.longitude),
             // geofenceFeature(),
             TextField(
               controller: widget.locationController,
