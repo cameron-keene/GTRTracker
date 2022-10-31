@@ -37,7 +37,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                               fontSize: 25,
                               fontWeight: FontWeight.bold),
                         )))),
-            const locationWidget(),
+            locationWidget(),
             Divider(color: Color.fromARGB(255, 255, 255, 255)),
             Center(
                 child: Container(

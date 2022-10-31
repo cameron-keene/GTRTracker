@@ -1,12 +1,14 @@
 // flutter and ui libraries
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 
 // amplify packages we will need to use
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gtrtracker/models/Location.dart';
 
 class locationWidget extends StatefulWidget {
-  const locationWidget({super.key});
+  final LatLng _center = LatLng(27.00000, 27.0000000);
 
   @override
   State<locationWidget> createState() => _locationWidgetState();
@@ -14,8 +16,6 @@ class locationWidget extends StatefulWidget {
 
 class _locationWidgetState extends State<locationWidget> {
   late GoogleMapController mapController;
-
-  final LatLng _center = const LatLng(29.648198545235758, -82.34372474439299);
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -30,7 +30,7 @@ class _locationWidgetState extends State<locationWidget> {
           child: GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(
-              target: _center,
+              target: widget._center,
               zoom: 18,
             ),
           ),
