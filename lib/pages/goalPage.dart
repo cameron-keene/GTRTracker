@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_api/amplify_api.dart';
-
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 // amplify configuration and models that should have been generated for you
 import 'package:gtrtracker/amplifyconfiguration.dart';
 import 'package:gtrtracker/models/ModelProvider.dart';
@@ -130,10 +131,17 @@ class AddGoalForm extends StatefulWidget {
 }
 
 class _AddGoalFormState extends State<AddGoalForm> {
+
+  late GoogleMapController mapController;
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _goalDurationController = TextEditingController();
   final _addressController = TextEditingController();
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+  
 
   Future<void> _saveGoal() async {
     // get the current text field contents
@@ -148,6 +156,7 @@ class _AddGoalFormState extends State<AddGoalForm> {
     List<test.Location> locations = await test.locationFromAddress(location);
     latitude = locations.elementAt(0).latitude;
     longitude = locations.elementAt(0).longitude;
+    
     print("latitude: $latitude, longitude: $longitude");
     print("starting geoFencing Service");
 
@@ -174,8 +183,33 @@ class _AddGoalFormState extends State<AddGoalForm> {
     }
   }
 
+  Future<void> _saveLocation() async {
+
+    // get the current text field contents
+    final location = _addressController.text;
+
+    double latitude;
+    double longitude;
+
+    List<test.Location> locations = await test.locationFromAddress(location);
+    latitude = locations.elementAt(0).latitude;
+    longitude = locations.elementAt(0).longitude;
+    
+    print("latitude: $latitude, longitude: $longitude");
+    print("starting geoFencing Service");
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => viewGoal(latitude: latitude, longitude: longitude)),
+    );
+
+    // create a new Goal from the form values
+    // `isComplete` is also required, but should start false in a new Goal
+  }
+
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Goal'),
@@ -220,6 +254,10 @@ class _AddGoalFormState extends State<AddGoalForm> {
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
               ElevatedButton(
+                child: const Text('View Goal Location'),
+                onPressed: _saveLocation
+              ),
+              ElevatedButton(
                 onPressed: _saveGoal,
                 child: const Text('Save'),
               )
@@ -228,5 +266,63 @@ class _AddGoalFormState extends State<AddGoalForm> {
         ),
       ),
     );
+  }
+}
+
+class viewGoal extends StatefulWidget {
+  double latitude;
+  double longitude;
+
+  viewGoal({Key? key, required this.latitude, required this.longitude}) : super(key: key);
+
+  @override
+  State<viewGoal> createState() => _viewGoalState();
+
+}
+
+  class _viewGoalState extends State<viewGoal> {
+
+    late GoogleMapController mapController;
+
+      void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final LatLng _center = LatLng(widget.latitude, widget.longitude);
+    Set<Circle> circles = Set.from([Circle(
+      circleId: CircleId("geofence"),
+      center: LatLng(widget.latitude, widget.longitude),
+      radius: 65,
+      fillColor: Color.fromARGB(92, 43, 121, 194),
+      strokeColor: Color.fromARGB(122, 43, 121, 194),
+    )]);
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 27, 27, 27),
+        title: Text("Goal Location", style: TextStyle(color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
+      ),
+      backgroundColor: Color.fromARGB(255, 27, 27, 27),
+      
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget> [
+      
+      Expanded(child: Padding(
+        padding: EdgeInsets.all(7.0), 
+        child: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: 18,),
+          circles: circles,
+          ),
+        )
+      ),
+    ], 
+      ),
+    )
+    ;
   }
 }

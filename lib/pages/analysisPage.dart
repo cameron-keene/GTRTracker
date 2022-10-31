@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 // amplify packages we will need to use
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'locationWidget.dart';
 
 class AnalysisPage extends StatefulWidget {
   const AnalysisPage({Key? key}) : super(key: key);
@@ -13,14 +13,6 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
-  late GoogleMapController mapController;
-
-  final LatLng _center = const LatLng(29.648198545235758, -82.34372474439299);
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,18 +37,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                               fontSize: 25,
                               fontWeight: FontWeight.bold),
                         )))),
-            SizedBox(
-                height: 500,
-                child: Padding(
-                  padding: EdgeInsets.all(7.0),
-                  child: GoogleMap(
-                    onMapCreated: _onMapCreated,
-                    initialCameraPosition: CameraPosition(
-                      target: _center,
-                      zoom: 18,
-                    ),
-                  ),
-                )),
+            const locationWidget(),
             Divider(color: Color.fromARGB(255, 255, 255, 255)),
             Center(
                 child: Container(
