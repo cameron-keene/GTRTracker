@@ -150,10 +150,9 @@ class _detailScreenState extends State<detailScreen> {
       ),
     );
   }
-
   double getPercentage(Goal currentGoal) {
     double percentage = currentGoal.currentDuration / currentGoal.goalDuration;
-    // debugPrint("percentage is: " + percentage.toString());
+    debugPrint("percentage is: " + percentage.toString());
     return percentage;
   }
 }
