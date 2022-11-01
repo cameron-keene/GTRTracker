@@ -18,7 +18,7 @@ import 'package:gtrtracker/goalClass/Goal.dart';
 
 // need to hide the location package from the geocoding package
 import 'package:geocoding/geocoding.dart' as test;
-import 'package:gtrtracker/widgets/sliderWidget.dart';
+
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({Key? key}) : super(key: key);
