@@ -13,6 +13,13 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
+  // try {
+  //   // get the goal and the goal duration
+  //   activityList = await Amplify.DataStore.query(GeoActivity.classType,
+  //       where: GeoActivity.GOALID.eq(goalID));
+  // } catch (e) {
+  //   debugPrint("error: " + e.toString());
+  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

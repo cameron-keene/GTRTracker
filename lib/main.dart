@@ -472,6 +472,7 @@ class geofence {
 
   Future<void> updateGoalDuration(String goalID, int duration) async {
     List<Goal> goalList = [];
+    List<GeoActivity> activityList = [];
     try {
       // get the goal and the goal duration
       goalList = await Amplify.DataStore.query(Goal.classType,
@@ -479,6 +480,7 @@ class geofence {
     } catch (e) {
       debugPrint("error: " + e.toString());
     }
+
     debugPrint("first: " + goalList.first.toString());
     final goal = goalList.first;
     int newDuration = goal.currentDuration + duration.toInt();
