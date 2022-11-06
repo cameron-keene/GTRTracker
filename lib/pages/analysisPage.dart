@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 
 // amplify packages we will need to use
 import 'package:google_fonts/google_fonts.dart';
-import 'locationWidget.dart';
+import 'package:graphic/graphic.dart';
+
+import "data.dart";
+import 'package:intl/intl.dart';
+
+final _monthDayFormat = DateFormat('MM-dd');
 
 class AnalysisPage extends StatefulWidget {
   const AnalysisPage({Key? key}) : super(key: key);
@@ -47,32 +52,109 @@ class _AnalysisPageState extends State<AnalysisPage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                   )),
-              ListTileTheme(
-                  contentPadding: const EdgeInsets.all(8),
-                  iconColor: Color.fromARGB(255, 0, 0, 0),
-                  textColor: Color.fromARGB(255, 0, 0, 0),
-                  tileColor: Color.fromARGB(255, 255, 255, 255),
-                  style: ListTileStyle.list,
-                  dense: true,
-                  child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(8.0),
-                      itemCount: 3,
-                      itemBuilder: (context, index) {
-                        return Card(
-                            child: ListTile(
-                          shape: border,
-                          trailing: Icon(Icons.more_vert),
-                          title: Text(
-                            "First",
-                            textScaleFactor: 1.5,
-                            style: GoogleFonts.roboto(
-                                fontSize: 13, fontWeight: FontWeight.w500),
-                          ),
-                        ));
-                      }))
+              Container(
+                color: Color.fromARGB(255, 255, 255, 255),
+                margin: const EdgeInsets.only(top: 10),
+                width: 350,
+                height: 300,
+                child: Chart(
+                  data: timeSeriesSales,
+                  variables: {
+                    'time': Variable(
+                      accessor: (TimeSeriesSales datum) => datum.time,
+                      scale: TimeScale(
+                        formatter: (time) => _monthDayFormat.format(time),
+                      ),
+                    ),
+                    'sales': Variable(
+                      accessor: (TimeSeriesSales datum) => datum.sales,
+                    ),
+                  },
+                  elements: [
+                    LineElement(
+                      shape: ShapeAttr(value: BasicLineShape(dash: [5, 2])),
+                      selected: {
+                        'touchMove': {1}
+                      },
+                    )
+                  ],
+                  coord: RectCoord(color: const Color(0xffdddddd)),
+                  axes: [
+                    Defaults.horizontalAxis,
+                    Defaults.verticalAxis,
+                  ],
+                  selections: {
+                    'touchMove': PointSelection(
+                      on: {
+                        GestureType.scaleUpdate,
+                        GestureType.tapDown,
+                        GestureType.longPressMoveUpdate
+                      },
+                      dim: Dim.x,
+                    )
+                  },
+                  tooltip: TooltipGuide(
+                    followPointer: [false, true],
+                    align: Alignment.topLeft,
+                    offset: const Offset(-20, -20),
+                  ),
+                  crosshair: CrosshairGuide(followPointer: [false, true]),
+                ),
+              ),
+              const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                  )),
+              Container(
+                color: Color.fromARGB(255, 255, 255, 255),
+                margin: const EdgeInsets.only(top: 10),
+                width: 350,
+                height: 300,
+                child: Chart(
+                  data: timeSeriesSales,
+                  variables: {
+                    'time': Variable(
+                      accessor: (TimeSeriesSales datum) => datum.time,
+                      scale: TimeScale(
+                        formatter: (time) => _monthDayFormat.format(time),
+                      ),
+                    ),
+                    'sales': Variable(
+                      accessor: (TimeSeriesSales datum) => datum.sales,
+                    ),
+                  },
+                  elements: [
+                    LineElement(
+                      shape: ShapeAttr(value: BasicLineShape(dash: [5, 2])),
+                      selected: {
+                        'touchMove': {1}
+                      },
+                    )
+                  ],
+                  coord: RectCoord(color: const Color(0xffdddddd)),
+                  axes: [
+                    Defaults.horizontalAxis,
+                    Defaults.verticalAxis,
+                  ],
+                  selections: {
+                    'touchMove': PointSelection(
+                      on: {
+                        GestureType.scaleUpdate,
+                        GestureType.tapDown,
+                        GestureType.longPressMoveUpdate
+                      },
+                      dim: Dim.x,
+                    )
+                  },
+                  tooltip: TooltipGuide(
+                    followPointer: [false, true],
+                    align: Alignment.topLeft,
+                    offset: const Offset(-20, -20),
+                  ),
+                  crosshair: CrosshairGuide(followPointer: [false, true]),
+                ),
+              ),
             ]))));
   }
 }
