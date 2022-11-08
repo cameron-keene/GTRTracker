@@ -1,6 +1,7 @@
 // dart async library we will refer to when setting up real time updates
 import 'dart:async';
 import 'dart:collection';
+import 'dart:ffi';
 
 // flutter and ui libraries
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtrtracker/goalClass/Goal.dart';
+import 'package:gtrtracker/models/GeoActivity.dart';
 
 import './pages/goalPage.dart';
 
@@ -75,7 +77,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     readFromDatabase();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    debugPrint("starting geofence.....");
     widget.testGeo.geofenceInitial();
   }
 
@@ -120,17 +121,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-    if (state == AppLifecycleState.resumed) {
-      debugPrint("active");
-    } else if (state == AppLifecycleState.inactive) {
-      debugPrint("inactive");
-      widget.testGeo.geofenceInitial();
-    } else if (state == AppLifecycleState.detached) {
-      debugPrint("detached");
-      widget.testGeo.geofenceInitial();
-    } else if (state == AppLifecycleState.paused) {
-      debugPrint("paused");
-    }
+    // if (state == AppLifecycleState.resumed) {
+    //   debugPrint("active");
+    // } else if (state == AppLifecycleState.inactive) {
+    //   debugPrint("inactive");
+    //   widget.testGeo.geofenceInitial();
+    // } else if (state == AppLifecycleState.detached) {
+    //   debugPrint("detached");
+    //   widget.testGeo.geofenceInitial();
+    // } else if (state == AppLifecycleState.paused) {
+    //   debugPrint("paused");
+    // }
   }
 
   @override
@@ -169,6 +170,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildContentView() {
+    if (!_isLoading) {
+      // testInitializeGeoFenceList();
+      widget.testGeo.geofenceListInitialize(_goals);
+    }
     final border = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(15.0),
     );
@@ -397,7 +402,7 @@ class MyTaskHandler extends TaskHandler {
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     debugPrint("on event - event count task running in background");
-    testGeo.geofenceInitial();
+    // testGeo.geofenceInitial();
     // call the flutter geofence_service update.
 
     // Send data to the main isolate.
@@ -448,39 +453,90 @@ class geofence {
       geofenceRadiusSortType: GeofenceRadiusSortType.DESC);
 
   // Create a [Geofence] list.
-  final _geofenceList = <Geofence>[
-    Geofence(
-      id: 'place_1',
-      latitude: 35.103422,
-      longitude: 129.036023,
-      radius: [
-        GeofenceRadius(id: 'radius_100m', length: 100),
-        GeofenceRadius(id: 'radius_25m', length: 25),
-        GeofenceRadius(id: 'radius_250m', length: 250),
-        GeofenceRadius(id: 'radius_200m', length: 200),
-      ],
-    ),
-    Geofence(
-      id: 'place_2',
-      latitude: 35.104971,
-      longitude: 129.034851,
-      radius: [
-        GeofenceRadius(id: 'radius_25m', length: 25),
-        GeofenceRadius(id: 'radius_100m', length: 100),
-        GeofenceRadius(id: 'radius_200m', length: 200),
-      ],
-    ),
-  ];
+  final _geofenceList = <Geofence>[];
+
+  // flag to detect first entry
+  bool wasEntered = false;
+
+  late DateTime enter;
+  late DateTime exit;
+
+  Future<void> createActivity(
+      String _goalID, DateTime _timestamp, int _duration) async {
+    final item = GeoActivity(
+        goalID: _goalID,
+        activityTime: TemporalDateTime(_timestamp),
+        duration: _duration.toInt());
+    await Amplify.DataStore.save(item);
+  }
+
+  Future<void> updateGoalDuration(String goalID, int duration) async {
+    List<Goal> goalList = [];
+    try {
+      // get the goal and the goal duration
+      goalList = await Amplify.DataStore.query(Goal.classType,
+          where: Goal.ID.eq(goalID));
+    } catch (e) {
+      debugPrint("error: " + e.toString());
+    }
+    debugPrint("first: " + goalList.first.toString());
+    final goal = goalList.first;
+    int newDuration = goal.currentDuration + duration.toInt();
+    // UPDATE GOAL WITH NEW DURATION
+    final updatedGoal = goal.copyWith(
+        name: goal.name,
+        description: goal.description,
+        isComplete: goal.isComplete,
+        goalDuration: goal.goalDuration,
+        currentDuration: newDuration,
+        latitude: goal.latitude,
+        longitude: goal.longitude,
+        Activities: goal.Activities);
+    // SAVE THE NEW GOAL
+    await Amplify.DataStore.save(updatedGoal);
+  }
+
+  Future<void> calcDuration(
+      DateTime enter, DateTime exit, String goalID) async {
+    // convert the DateTime to the duration
+    // only care about the hours and minutes
+    // convert everything to hours.
+    Duration enterDur = Duration(hours: enter.hour, minutes: enter.minute);
+    Duration exitDur = Duration(hours: exit.hour, minutes: exit.minute);
+    Duration result = exitDur - enterDur;
+    // debugPrint("result: " + result.inMinutes.toString());
+    createActivity(goalID, enter, result.inMinutes);
+    updateGoalDuration(goalID, result.inMinutes);
+    // reset the enter/exit time
+    enter = DateTime(0);
+    exit = DateTime(0);
+  }
+
   // This function is to be called when the geofence status is changed.
   Future<void> _onGeofenceStatusChanged(
       Geofence geofence,
       GeofenceRadius geofenceRadius,
       GeofenceStatus geofenceStatus,
       Location location) async {
-    print('geofence: ${geofence.toJson()}');
-    print('geofenceRadius: ${geofenceRadius.toJson()}');
-    print('geofenceStatus: ${geofenceStatus.toString()}');
+    // print('geofenceRadius: ${geofenceRadius.toJson()}');
+    // print('geofenceStatus: ${geofenceStatus.toString()}');
     _geofenceStreamController.sink.add(geofence);
+    // TODO: need to create activity corresponding to goal.
+    if (geofenceStatus == GeofenceStatus.ENTER && !wasEntered) {
+      wasEntered = !wasEntered;
+      debugPrint("geofence entered, wait for exit");
+      debugPrint('geofence timestamp enter: ${geofence.timestamp}');
+      enter = geofence.timestamp!;
+      // createActivity(geofence.id, geofence.timestamp!, 'ENTER');
+    } else if (geofenceStatus == GeofenceStatus.EXIT && wasEntered) {
+      debugPrint('geofence: ${geofence.toJson()}');
+      debugPrint('geofence timestamp exit: ${geofence.timestamp}');
+      debugPrint("geofence exited need to create activity");
+      exit = geofence.timestamp!;
+      calcDuration(enter, exit, geofence.id);
+      wasEntered = !wasEntered;
+      // TODO: since exit need to query previous enter then calc duration.
+    }
   }
 
 // This function is to be called when the activity has changed.
@@ -512,13 +568,40 @@ class geofence {
     print('ErrorCode: $errorCode');
   }
 
+  // TODO: create function to pull all goals then create geofence for each.
+  void geofenceListInitialize(List<Goal> _goals) {
+    //TODO: create a new geofence object then add it to the list.
+    for (var i = 0; i < _goals.length; i++) {
+      var goalID = _goals[i].id;
+      var lat = _goals[i].latitude;
+      var long = _goals[i].longitude;
+      Geofence temp = Geofence(
+        id: goalID.toString(),
+        latitude: lat,
+        longitude: long,
+        radius: [
+          GeofenceRadius(id: goalID + ' radius_50m', length: 50),
+        ],
+      );
+      // _geofenceList.add(temp);
+      _geofenceService.addGeofence(temp);
+      // debugPrint("goalID: " + goalID);
+      // debugPrint("lat: " + lat.toString());
+      // debugPrint("long: " + long.toString());
+    }
+  }
+
   void geofenceInitial() {
-    _geofenceService.addGeofenceStatusChangeListener(_onGeofenceStatusChanged);
-    _geofenceService.addLocationChangeListener(_onLocationChanged);
-    _geofenceService.addLocationServicesStatusChangeListener(
-        _onLocationServicesStatusChanged);
-    _geofenceService.addActivityChangeListener(_onActivityChanged);
-    _geofenceService.addStreamErrorListener(_onError);
-    _geofenceService.start(_geofenceList).catchError(_onError);
+    // TODO: Need to check if already started
+    if (!_geofenceService.isRunningService) {
+      _geofenceService
+          .addGeofenceStatusChangeListener(_onGeofenceStatusChanged);
+      _geofenceService.addLocationChangeListener(_onLocationChanged);
+      _geofenceService.addLocationServicesStatusChangeListener(
+          _onLocationServicesStatusChanged);
+      _geofenceService.addActivityChangeListener(_onActivityChanged);
+      _geofenceService.addStreamErrorListener(_onError);
+      _geofenceService.start(_geofenceList).catchError(_onError);
+    }
   }
 }

@@ -167,7 +167,7 @@ class _AddGoalFormState extends State<AddGoalForm> {
     final newGoal = Goal(
         name: name,
         description: description,
-        goalDuration: int.parse(goalDuration),
+        goalDuration: int.parse(goalDuration) * 60,
         currentDuration: 0,
         radius: graaa.toInt(),
         latitude: latitude,
