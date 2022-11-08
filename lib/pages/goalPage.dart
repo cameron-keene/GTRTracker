@@ -4,6 +4,7 @@ import 'dart:core';
 
 // flutter and ui libraries
 import 'package:flutter/material.dart';
+import 'package:snack/snack.dart';
 
 // amplify packages we will need to use
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -131,17 +132,18 @@ class AddGoalForm extends StatefulWidget {
 }
 
 class _AddGoalFormState extends State<AddGoalForm> {
-
   late GoogleMapController mapController;
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _goalDurationController = TextEditingController();
   final _addressController = TextEditingController();
+  late double latitude;
+  late double longitude;
+  late double graaa;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
-  
 
   Future<void> _saveGoal() async {
     // get the current text field contents
@@ -156,7 +158,7 @@ class _AddGoalFormState extends State<AddGoalForm> {
     List<test.Location> locations = await test.locationFromAddress(location);
     latitude = locations.elementAt(0).latitude;
     longitude = locations.elementAt(0).longitude;
-    
+
     print("latitude: $latitude, longitude: $longitude");
     print("starting geoFencing Service");
 
@@ -165,9 +167,9 @@ class _AddGoalFormState extends State<AddGoalForm> {
     final newGoal = Goal(
         name: name,
         description: description,
-        isComplete: false,
         goalDuration: int.parse(goalDuration) * 60,
         currentDuration: 0,
+        radius: graaa.toInt(),
         latitude: latitude,
         longitude: longitude);
 
@@ -184,32 +186,30 @@ class _AddGoalFormState extends State<AddGoalForm> {
   }
 
   Future<void> _saveLocation() async {
-
     // get the current text field contents
     final location = _addressController.text;
-
-    double latitude;
-    double longitude;
 
     List<test.Location> locations = await test.locationFromAddress(location);
     latitude = locations.elementAt(0).latitude;
     longitude = locations.elementAt(0).longitude;
-    
+
     print("latitude: $latitude, longitude: $longitude");
     print("starting geoFencing Service");
+  }
 
-    Navigator.push(
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    graaa = (await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => viewGoal(latitude: latitude, longitude: longitude)),
-    );
-
-    // create a new Goal from the form values
-    // `isComplete` is also required, but should start false in a new Goal
+      MaterialPageRoute(
+          builder: (context) => viewGoal(
+                latitude: latitude,
+                longitude: longitude,
+              )),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Goal'),
@@ -254,9 +254,9 @@ class _AddGoalFormState extends State<AddGoalForm> {
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
               ),
               ElevatedButton(
-                child: const Text('View Goal Location'),
-                onPressed: _saveLocation
-              ),
+                  child: const Text('View Goal Location'),
+                  onPressed: () =>
+                      {_saveLocation(), _navigateAndDisplaySelection(context)}),
               ElevatedButton(
                 onPressed: _saveGoal,
                 child: const Text('Save'),
@@ -273,56 +273,79 @@ class viewGoal extends StatefulWidget {
   double latitude;
   double longitude;
 
-  viewGoal({Key? key, required this.latitude, required this.longitude}) : super(key: key);
+  viewGoal({
+    Key? key,
+    required this.latitude,
+    required this.longitude,
+  }) : super(key: key);
 
   @override
   State<viewGoal> createState() => _viewGoalState();
-
 }
 
-  class _viewGoalState extends State<viewGoal> {
+class _viewGoalState extends State<viewGoal> {
+  late GoogleMapController mapController;
+  double rad = 150;
 
-    late GoogleMapController mapController;
-
-      void _onMapCreated(GoogleMapController controller) {
+  void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
 
   @override
   Widget build(BuildContext context) {
     final LatLng _center = LatLng(widget.latitude, widget.longitude);
-    Set<Circle> circles = Set.from([Circle(
-      circleId: CircleId("geofence"),
-      center: LatLng(widget.latitude, widget.longitude),
-      radius: 65,
-      fillColor: Color.fromARGB(92, 43, 121, 194),
-      strokeColor: Color.fromARGB(122, 43, 121, 194),
-    )]);
+    Set<Circle> circles = Set.from([
+      Circle(
+        circleId: CircleId("geofence"),
+        center: LatLng(widget.latitude, widget.longitude),
+        radius: rad,
+        fillColor: Color.fromARGB(92, 43, 121, 194),
+        strokeColor: Color.fromARGB(122, 43, 121, 194),
+      )
+    ]);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: Text("Goal Location", style: TextStyle(color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
+        title: Text("Goal Location",
+            style: TextStyle(
+                color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      
       body: Column(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget> [
-      
-      Expanded(child: Padding(
-        padding: EdgeInsets.all(7.0), 
-        child: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 18,),
-          circles: circles,
-          ),
-        )
+        children: <Widget>[
+          Expanded(
+              child: Padding(
+            padding: EdgeInsets.all(7.0),
+            child: GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 18,
+              ),
+              circles: circles,
+            ),
+          )),
+          Container(
+              //slider
+              child: Slider(
+            min: 100,
+            max: 1000,
+            value: rad,
+            onChanged: (value) {
+              setState(() {
+                rad = value;
+              });
+            },
+          )),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context, rad);
+            },
+            child: const Text('Done'),
+          )
+        ],
       ),
-    ], 
-      ),
-    )
-    ;
+    );
   }
 }

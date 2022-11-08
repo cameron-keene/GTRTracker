@@ -22,10 +22,6 @@ import 'package:geocoding/geocoding.dart' as test;
 class detailScreen extends StatefulWidget {
   detailScreen({Key? key, required this.goal}) : super(key: key);
   final Goal goal;
-  TextEditingController latitudeController = new TextEditingController();
-  TextEditingController longitudeController = new TextEditingController();
-  TextEditingController radiusController = new TextEditingController();
-  TextEditingController locationController = new TextEditingController();
 
   @override
   State<detailScreen> createState() => _detailScreenState();
@@ -47,7 +43,7 @@ class _detailScreenState extends State<detailScreen> {
       Circle(
         circleId: CircleId("geofence"),
         center: LatLng(widget.goal.latitude, widget.goal.longitude),
-        radius: 65,
+        radius: (widget.goal.radius.toDouble()),
         fillColor: Color.fromARGB(92, 43, 121, 194),
         strokeColor: Color.fromARGB(122, 43, 121, 194),
       )
