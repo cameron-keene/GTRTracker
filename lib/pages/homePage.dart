@@ -138,3 +138,21 @@ class _HomePageState extends State<HomePage> {
               ])));
   }
 }
+
+
+/* Query geoactivity
+try {
+  List<GeoActivity> GeoActivitys = await Amplify.DataStore.query(GeoActivity.classType);
+} catch (e) {
+  print("Could not query DataStore: " + e);
+}
+
+*/
+
+/* Query Goal
+try {
+  List<Goal> Goals = await Amplify.DataStore.query(Goal.classType);
+} catch (e) {
+  print("Could not query DataStore: " + e);
+}
+*/

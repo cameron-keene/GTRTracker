@@ -44,7 +44,7 @@ class GoalItem extends StatelessWidget {
     }
   }
 
-  Future<void> _toggleIsComplete() async {
+  /*Future<void> _toggleIsComplete() async {
     // copy the Goal we wish to update, but with updated properties
     final updatedGoal = goal.copyWith(isComplete: !goal.isComplete);
     try {
@@ -54,15 +54,15 @@ class GoalItem extends StatelessWidget {
     } catch (e) {
       print('An error occurred while saving Goal: $e');
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () {
-          _toggleIsComplete();
-        },
+        //onTap: () {
+        // _toggleIsComplete();
+        //},
         onLongPress: () {
           _deleteGoal(context);
         },
@@ -82,11 +82,11 @@ class GoalItem extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-                goal.isComplete
-                    ? Icons.check_box
-                    : Icons.check_box_outline_blank,
-                size: iconSize),
+            //Icon(
+            //goal.isComplete
+            // ? Icons.check_box
+            // : Icons.check_box_outline_blank,
+            //size: iconSize),
           ]),
         ),
       ),
