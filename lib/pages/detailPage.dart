@@ -22,6 +22,10 @@ import 'package:geocoding/geocoding.dart' as test;
 class detailScreen extends StatefulWidget {
   detailScreen({Key? key, required this.goal}) : super(key: key);
   final Goal goal;
+  TextEditingController latitudeController = new TextEditingController();
+  TextEditingController longitudeController = new TextEditingController();
+  TextEditingController radiusController = new TextEditingController();
+  TextEditingController locationController = new TextEditingController();
 
   @override
   State<detailScreen> createState() => _detailScreenState();
@@ -146,9 +150,10 @@ class _detailScreenState extends State<detailScreen> {
       ),
     );
   }
+
   double getPercentage(Goal currentGoal) {
     double percentage = currentGoal.currentDuration / currentGoal.goalDuration;
-    debugPrint("percentage is: " + percentage.toString());
+    // debugPrint("percentage is: " + percentage.toString());
     return percentage;
   }
 }

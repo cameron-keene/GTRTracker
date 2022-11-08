@@ -4,7 +4,6 @@ import 'dart:core';
 
 // flutter and ui libraries
 import 'package:flutter/material.dart';
-import 'package:snack/snack.dart';
 
 // amplify packages we will need to use
 import 'package:amplify_flutter/amplify_flutter.dart';
