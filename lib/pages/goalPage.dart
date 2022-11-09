@@ -254,8 +254,10 @@ class _AddGoalFormState extends State<AddGoalForm> {
               ),
               ElevatedButton(
                   child: const Text('View Goal Location'),
-                  onPressed: () =>
-                      {_saveLocation(), _navigateAndDisplaySelection(context)}),
+                  onPressed: () async => {
+                        await _saveLocation(),
+                        _navigateAndDisplaySelection(context)
+                      }),
               ElevatedButton(
                 onPressed: _saveGoal,
                 child: const Text('Save'),
