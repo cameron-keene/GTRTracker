@@ -13,6 +13,11 @@ import '../models/ModelProvider.dart';
 import 'locationWidget.dart';
 import '../models/Goal.dart';
 
+// amplify packages we will need to use
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:amplify_datastore/amplify_datastore.dart';
+import 'package:amplify_api/amplify_api.dart';
+
 // test imports
 // import 'dart:async';
 
@@ -20,6 +25,7 @@ import '../models/Goal.dart';
 import 'package:geocoding/geocoding.dart' as test;
 
 class detailScreen extends StatefulWidget {
+
   detailScreen({Key? key, required this.goal}) : super(key: key);
   final Goal goal;
   TextEditingController latitudeController = new TextEditingController();
@@ -120,6 +126,34 @@ class _detailScreenState extends State<detailScreen> {
             ),
           )), //update with current hours towards goal
           Divider(color: Color.fromARGB(255, 255, 255, 255)),
+          Center(
+              child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Perceived Productivity',
+                        style: GoogleFonts.roboto(
+                            color: Color.fromARGB(255, 43, 121, 194),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      )))),
+
+          // Slider for Preceived Productivity
+          Center(
+              child: Slider(
+            min: 0,
+            max: 100,
+            divisions: 100,
+            value: getProductivity() * 100,
+            label: (getProductivity() * 100).round().toString(),
+            onChanged: (value) async {
+              final updatedItem =
+                  widget.goal.copyWith(productivity: (value / 100));
+              await Amplify.DataStore.save(updatedItem);
+            },
+          )), //update with current hours towards goal
+          Divider(color: Color.fromARGB(255, 255, 255, 255)),
 
           Center(
               child: Container(
@@ -155,5 +189,9 @@ class _detailScreenState extends State<detailScreen> {
     double percentage = currentGoal.currentDuration / currentGoal.goalDuration;
     // debugPrint("percentage is: " + percentage.toString());
     return percentage;
+  }
+
+  double getProductivity() {
+    return widget.goal.productivity;
   }
 }

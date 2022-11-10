@@ -98,7 +98,7 @@ class _GoalsPageState extends State<GoalsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
-        title: const Text('Goals',
+        title: const Text('Modify Goals',
             style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
