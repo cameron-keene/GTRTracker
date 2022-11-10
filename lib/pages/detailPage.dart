@@ -13,6 +13,11 @@ import '../models/ModelProvider.dart';
 import 'locationWidget.dart';
 import '../models/Goal.dart';
 
+// amplify packages we will need to use
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:amplify_datastore/amplify_datastore.dart';
+import 'package:amplify_api/amplify_api.dart';
+
 // test imports
 // import 'dart:async';
 
@@ -40,9 +45,34 @@ class _detailScreenState extends State<detailScreen> {
     mapController = controller;
   }
 
+  bool showActivities = false;
+  final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
+    onPrimary: Colors.black87,
+    primary: Colors.grey[300],
+    minimumSize: Size(88, 36),
+    padding: EdgeInsets.symmetric(horizontal: 16),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(2)),
+    ),
+  );
+
+  final List<bool> _selectedPage = <bool>[true, false];
+  bool vertical = false;
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> pageTypes = <Widget>[
+      Container(
+          alignment: Alignment.center,
+          width: (MediaQuery.of(context).size.width / 2) - 2,
+          child: Text('Details')),
+      Container(
+          alignment: Alignment.center,
+          width: (MediaQuery.of(context).size.width / 2) - 2,
+          child: Text('Activities'))
+    ];
     final LatLng _center = LatLng(widget.goal.latitude, widget.goal.longitude);
+
     Set<Circle> circles = Set.from([
       Circle(
         circleId: CircleId("geofence"),
@@ -64,88 +94,186 @@ class _detailScreenState extends State<detailScreen> {
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-              child: Container(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Goal Description',
-                        style: GoogleFonts.roboto(
-                            color: Color.fromARGB(255, 43, 121, 194),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
-                      )))),
-
-          //goal description
-          Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.goal.description ?? "",
-                    textAlign: TextAlign.left,
-                    style: GoogleFonts.roboto(
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      fontSize: 20,
-                    ),
-                  ))),
-
-          Divider(color: Color.fromARGB(255, 255, 255, 255)),
-
-          Center(
-              child: Container(
-                  padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Goal Progress',
-                        style: GoogleFonts.roboto(
-                            color: Color.fromARGB(255, 43, 121, 194),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
-                      )))),
-
-          //progress bar
-          Center(
-              child: Container(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-            color: Color.fromARGB(132, 56, 56, 56),
-            child: LinearProgressIndicator(
-              minHeight: 7,
-              backgroundColor: Color.fromARGB(255, 255, 255, 255),
-              valueColor: new AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 43, 121, 194)),
-              value: getPercentage(widget.goal),
+          ToggleButtons(
+            
+            direction: vertical ? Axis.vertical : Axis.horizontal,
+            onPressed: (int index) {
+              setState(() {
+                // The button that is tapped is set to true, and the others to false.
+                for (int i = 0; i < _selectedPage.length; i++) {
+                  _selectedPage[i] = i == index;
+                  if (index == 0) {
+                    showActivities = false;
+                  } else if (index == 1) {
+                    showActivities = true;
+                  }
+                }
+              });
+            },
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            selectedColor: Colors.white,
+            fillColor: Color.fromARGB(255, 43, 121, 194),
+            color: Colors.white,
+            constraints: const BoxConstraints(
+              minHeight: 40.0,
+              minWidth: 80.0,
             ),
-          )), //update with current hours towards goal
-          Divider(color: Color.fromARGB(255, 255, 255, 255)),
+            isSelected: _selectedPage,
+            children: pageTypes,
+          ),
+          // ElevatedButton(
+          //   style: raisedButtonStyle,
+          //   onPressed: () {
+          //     debugPrint("button pressed");
+          //     setState(() {
+          //       showActivities = !showActivities;
+          //     });
+          //   },
+          //   child: Text('Looks like a RaisedButton'),
+          // ),
 
-          Center(
-              child: Container(
-                  padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Goal Location',
-                        style: GoogleFonts.roboto(
-                            color: Color.fromARGB(255, 43, 121, 194),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
-                      )))),
+          if (showActivities) ...[
+            Center(
+                child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'All Activities',
+                          style: GoogleFonts.roboto(
+                              color: Color.fromARGB(255, 43, 121, 194),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )))),
 
-          Expanded(
-              child: Padding(
-            padding: EdgeInsets.all(7.0),
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 18,
+            //progress bar
+            Center(
+                child: Container(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+              color: Color.fromARGB(132, 56, 56, 56),
+              child: LinearProgressIndicator(
+                minHeight: 7,
+                backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                valueColor: new AlwaysStoppedAnimation<Color>(
+                    Color.fromARGB(255, 43, 121, 194)),
+                value: getPercentage(widget.goal),
               ),
-              circles: circles,
-            ),
-          )),
+            )), //update with current hours towards goal
+          ],
+          if (!showActivities) ...[
+            Center(
+                child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Goal Description',
+                          style: GoogleFonts.roboto(
+                              color: Color.fromARGB(255, 43, 121, 194),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )))),
+
+            //goal description
+            Padding(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      widget.goal.description ?? "",
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.roboto(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontSize: 20,
+                      ),
+                    ))),
+
+            Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+            Center(
+                child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Goal Progress',
+                          style: GoogleFonts.roboto(
+                              color: Color.fromARGB(255, 43, 121, 194),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )))),
+
+            //progress bar
+            Center(
+                child: Container(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+              color: Color.fromARGB(132, 56, 56, 56),
+              child: LinearProgressIndicator(
+                minHeight: 7,
+                backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                valueColor: new AlwaysStoppedAnimation<Color>(
+                    Color.fromARGB(255, 43, 121, 194)),
+                value: getPercentage(widget.goal),
+              ),
+            )), //update with current hours towards goal
+
+            Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+            Center(
+                child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Perceived Productivity',
+                          style: GoogleFonts.roboto(
+                              color: Color.fromARGB(255, 43, 121, 194),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )))),
+
+            // Slider for Preceived Productivity
+            Center(
+                child: Slider(
+              min: 0,
+              max: 100,
+              divisions: 100,
+              value: getProductivity() * 100,
+              label: (getProductivity() * 100).round().toString(),
+              onChanged: (value) async {
+                final updatedItem =
+                    widget.goal.copyWith(productivity: (value / 100));
+                await Amplify.DataStore.save(updatedItem);
+              },
+            )), //update with current hours towards goal
+            Divider(color: Color.fromARGB(255, 255, 255, 255)),
+
+            Center(
+                child: Container(
+                    padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Goal Location',
+                          style: GoogleFonts.roboto(
+                              color: Color.fromARGB(255, 43, 121, 194),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )))),
+
+            Expanded(
+                child: Padding(
+              padding: EdgeInsets.all(7.0),
+              child: GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: _center,
+                  zoom: 18,
+                ),
+                circles: circles,
+              ),
+            )),
+          ],
         ],
       ),
     );
@@ -155,5 +283,9 @@ class _detailScreenState extends State<detailScreen> {
     double percentage = currentGoal.currentDuration / currentGoal.goalDuration;
     // debugPrint("percentage is: " + percentage.toString());
     return percentage;
+  }
+
+  double getProductivity() {
+    return widget.goal.productivity;
   }
 }
