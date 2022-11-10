@@ -170,7 +170,8 @@ class _AddGoalFormState extends State<AddGoalForm> {
         currentDuration: 0,
         radius: graaa.toInt(),
         latitude: latitude,
-        longitude: longitude);
+        longitude: longitude,
+        productivity: 1.0);
 
     try {
       // to write data to DataStore, we simply pass an instance of a model to
