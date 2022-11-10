@@ -576,12 +576,14 @@ class geofence {
       var goalID = _goals[i].id;
       var lat = _goals[i].latitude;
       var long = _goals[i].longitude;
+      String radiusName =
+          goalID.toString() + " radius_" + _goals[i].radius.toString() + "m";
       Geofence temp = Geofence(
         id: goalID.toString(),
         latitude: lat,
         longitude: long,
         radius: [
-          GeofenceRadius(id: goalID + ' radius_50m', length: 50),
+          GeofenceRadius(id: radiusName, length: _goals[i].radius.toDouble()),
         ],
       );
       // _geofenceList.add(temp);
