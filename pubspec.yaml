@@ -29,6 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+    
 
   amplify_flutter: ^0.6.0
   amplify_datastore: ^0.6.0
@@ -45,6 +46,8 @@ dependencies:
   geofence_service: ^3.5.0
   flutter_foreground_task: ^3.8.2
   google_maps_flutter: ^2.2.1
+  graphic: ^1.0.0
+  snack: ^2.0.0
 
 
 dev_dependencies:

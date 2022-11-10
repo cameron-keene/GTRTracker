@@ -47,7 +47,7 @@ class _detailScreenState extends State<detailScreen> {
       Circle(
         circleId: CircleId("geofence"),
         center: LatLng(widget.goal.latitude, widget.goal.longitude),
-        radius: 65,
+        radius: (widget.goal.radius.toDouble()),
         fillColor: Color.fromARGB(92, 43, 121, 194),
         strokeColor: Color.fromARGB(122, 43, 121, 194),
       )
@@ -150,9 +150,10 @@ class _detailScreenState extends State<detailScreen> {
       ),
     );
   }
+
   double getPercentage(Goal currentGoal) {
     double percentage = currentGoal.currentDuration / currentGoal.goalDuration;
-    debugPrint("percentage is: " + percentage.toString());
+    // debugPrint("percentage is: " + percentage.toString());
     return percentage;
   }
 }

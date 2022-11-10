@@ -488,7 +488,6 @@ class geofence {
     final updatedGoal = goal.copyWith(
         name: goal.name,
         description: goal.description,
-        isComplete: goal.isComplete,
         goalDuration: goal.goalDuration,
         currentDuration: newDuration,
         latitude: goal.latitude,
