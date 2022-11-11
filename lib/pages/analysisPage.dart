@@ -1,9 +1,13 @@
 // flutter and ui libraries
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 // amplify packages we will need to use
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphic/graphic.dart';
+import 'package:gtrtracker/goalClass/Goal.dart';
+import 'package:gtrtracker/models/Goal.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 
 import "data.dart";
 import 'package:intl/intl.dart';
@@ -18,22 +22,25 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
-  // try {
-  //   // get the goal and the goal duration
-  //   activityList = await Amplify.DataStore.query(GeoActivity.classType,
-  //       where: GeoActivity.GOALID.eq(goalID));
-  // } catch (e) {
-  //   debugPrint("error: " + e.toString());
-  // }
+  List<Goal> goals = [];
+
+  void getGoals() async {
+    try {
+      goals = await Amplify.DataStore.query(Goal.classType);
+      print("numgoals: " + goals.length.toString());
+    } catch (e) {
+      print("Could not query DataStore: " + e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    getGoals();
     final border = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(15.0),
     );
-
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 27, 27, 27),
           title: Text("Analysis",
               style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
         ),
@@ -42,6 +49,15 @@ class _AnalysisPageState extends State<AnalysisPage> {
             padding: const EdgeInsets.all(8.0),
             child: SingleChildScrollView(
                 child: Column(children: <Widget>[
+              Container(
+                child: Text(
+                  goals[0].toString(),
+                  style: GoogleFonts.roboto(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
               Center(
                   child: Container(
                       padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
