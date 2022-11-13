@@ -95,7 +95,6 @@ class _detailScreenState extends State<detailScreen> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           ToggleButtons(
-            
             direction: vertical ? Axis.vertical : Axis.horizontal,
             onPressed: (int index) {
               setState(() {
