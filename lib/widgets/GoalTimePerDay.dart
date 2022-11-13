@@ -15,7 +15,7 @@ final _monthDayFormat = DateFormat('MM-dd');
 
 class totalTimePerDay {
   final DateTime time;
-  final int total;
+  int total;
 
   totalTimePerDay(this.time, this.total);
 }
@@ -32,7 +32,10 @@ class _GoalTimePerDayState extends State<GoalTimePerDay> {
     List<GeoActivity> activities = [];
 
     try {
-      activities = await Amplify.DataStore.query(GeoActivity.classType);
+      activities = await Amplify.DataStore.query(
+        GeoActivity.classType,
+        sortBy: [GeoActivity.ACTIVITYTIME.ascending()],
+      ); //need sorted list for chart input
       print("numgoals: " + activities.length.toString());
     } catch (e) {
       print("Could not query DataStore: " + e.toString());
@@ -41,14 +44,42 @@ class _GoalTimePerDayState extends State<GoalTimePerDay> {
     return activities;
   }
 
+  List<totalTimePerDay> activityTotalPerDay(List<GeoActivity> activities) {
+    //iterates through all activities, add new days where they dont exist + total, adds to total where day exists.
+    //assumes input of an activity list ordered by activity date in ascending order
+    List<totalTimePerDay> totals = [];
+
+    activities.forEach((element) {
+      if (totals.isEmpty) {
+        //start case
+        totals.add(totalTimePerDay(element.activityTime,
+            element.duration)); //figuring out temporal time to date time
+      } else if (totals[totals.length - 1].time == element.activityTime) {
+        //activity on same day as previous
+        totals[totals.length - 1].total += element.duration;
+      } else {
+        //activity on different day as previous
+        totals.add(totalTimePerDay(element.activityTime, element.duration));
+      }
+    });
+
+    return totals;
+  }
+
+  Future<List<totalTimePerDay>> getTotalTimes() async {
+    List<totalTimePerDay> dataPoints = [];
+    List<GeoActivity> activities = await getActivities();
+    dataPoints = activityTotalPerDay(activities);
+
+    return dataPoints;
+  }
+
   /*  
   PSEUDOCODE FOR TREND: GOAL TIME PER DAY
 
   get all activities
 
-  separate activities by day
-
-  find total time spent in all activities for a given day
+  separate activities by day + find total time spent in all activities for a given day
 
   plot day against total
   
@@ -64,10 +95,10 @@ class _GoalTimePerDayState extends State<GoalTimePerDay> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<GeoActivity>>(
-        future: getActivities(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<GeoActivity>> snapshot) {
+    return FutureBuilder<List<totalTimePerDay>>(
+        future: getTotalTimes(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<totalTimePerDay>> snapshot) {
           List<Widget> children;
 
           if (snapshot.connectionState == ConnectionState.done) {
@@ -75,7 +106,8 @@ class _GoalTimePerDayState extends State<GoalTimePerDay> {
               children = <Widget>[
                 Container(
                   child: Text(
-                    snapshot.data![0].toString(),
+                    //snapshot.data![0].toString(),
+                    "DADA",
                     style: GoogleFonts.roboto(
                         color: Color.fromARGB(255, 255, 255, 255),
                         fontSize: 25,
@@ -105,15 +137,18 @@ class _GoalTimePerDayState extends State<GoalTimePerDay> {
                   width: 350,
                   height: 300,
                   child: Chart(
+                    //data: snapshot.data!,
                     data: timeSeriesSales,
                     variables: {
                       'time': Variable(
+                        //accessor: (totalTimePerDay datum) => datum.time,
                         accessor: (TimeSeriesSales datum) => datum.time,
                         scale: TimeScale(
                           formatter: (time) => _monthDayFormat.format(time),
                         ),
                       ),
                       'sales': Variable(
+                        //accessor: (totalTimePerDay datum) => datum.total,
                         accessor: (TimeSeriesSales datum) => datum.sales,
                       ),
                     },
