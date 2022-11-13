@@ -11,6 +11,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 
 import "data.dart";
 import 'package:intl/intl.dart';
+import "package:gtrtracker/models/GeoActivity.dart";
 
 final _monthDayFormat = DateFormat('MM-dd');
 
@@ -22,19 +23,28 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
-  List<Goal> goals = [];
-
   Future<List<Goal>> getGoals() async {
+    List<Goal> goals = [];
     try {
       goals = await Amplify.DataStore.query(Goal.classType);
-      // setState(() {
-      //   goals = yuh;
-      // });
       print("numgoals: " + goals.length.toString());
     } catch (e) {
       print("Could not query DataStore: " + e.toString());
     }
     return goals;
+  }
+
+  Future<List<GeoActivity>> getActivitiesByDay(DateTime day) async {
+    List<GeoActivity> activities = [];
+
+    try {
+      activities = await Amplify.DataStore.query(GeoActivity.classType);
+      print("numgoals: " + activities.length.toString());
+    } catch (e) {
+      print("Could not query DataStore: " + e.toString());
+    }
+
+    return activities;
   }
 
   @override
