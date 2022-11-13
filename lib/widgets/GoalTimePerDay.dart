@@ -7,10 +7,18 @@ import 'package:graphic/graphic.dart';
 import 'package:gtrtracker/models/Goal.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import "package:gtrtracker/pages/data.dart";
+import "package:gtrtracker/models/GeoActivity.dart";
 
 import 'package:intl/intl.dart';
 
 final _monthDayFormat = DateFormat('MM-dd');
+
+class totalTimePerDay {
+  final DateTime time;
+  final int total;
+
+  totalTimePerDay(this.time, this.total);
+}
 
 class GoalTimePerDay extends StatefulWidget {
   const GoalTimePerDay({super.key});
@@ -20,22 +28,46 @@ class GoalTimePerDay extends StatefulWidget {
 }
 
 class _GoalTimePerDayState extends State<GoalTimePerDay> {
-  Future<List<Goal>> getGoals() async {
-    List<Goal> goals = [];
+  Future<List<GeoActivity>> getActivities() async {
+    List<GeoActivity> activities = [];
+
     try {
-      goals = await Amplify.DataStore.query(Goal.classType);
-      print("numgoals: " + goals.length.toString());
+      activities = await Amplify.DataStore.query(GeoActivity.classType);
+      print("numgoals: " + activities.length.toString());
     } catch (e) {
       print("Could not query DataStore: " + e.toString());
     }
-    return goals;
+
+    return activities;
   }
+
+  /*  
+  PSEUDOCODE FOR TREND: GOAL TIME PER DAY
+
+  get all activities
+
+  separate activities by day
+
+  find total time spent in all activities for a given day
+
+  plot day against total
+  
+  final data structure:
+  
+  final totalTimeSpent = [
+  TotalTimePerDay(DateTime(2017, 9, 19), 5),
+  TotaltimePerDay(DateTime(2017, 9, 26), 25),
+  TotaltimePerDay(DateTime(2017, 10, 3), 100),
+  TotaltimePerDay(DateTime(2017, 10, 10), 75),
+];
+  */
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Goal>>(
-        future: getGoals(),
-        builder: (BuildContext context, AsyncSnapshot<List<Goal>> snapshot) {
+    return FutureBuilder<List<GeoActivity>>(
+        future: getActivities(),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<GeoActivity>> snapshot) {
           List<Widget> children;
 
           if (snapshot.connectionState == ConnectionState.done) {

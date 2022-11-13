@@ -7,7 +7,6 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:gtrtracker/widgets/GoalTimePerDay.dart';
 
 import 'package:intl/intl.dart';
-import "package:gtrtracker/models/GeoActivity.dart";
 
 final _monthDayFormat = DateFormat('MM-dd');
 
@@ -19,19 +18,6 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
-  Future<List<GeoActivity>> getActivitiesByDay(DateTime day) async {
-    List<GeoActivity> activities = [];
-
-    try {
-      activities = await Amplify.DataStore.query(GeoActivity.classType);
-      print("numgoals: " + activities.length.toString());
-    } catch (e) {
-      print("Could not query DataStore: " + e.toString());
-    }
-
-    return activities;
-  }
-
   @override
   Widget build(BuildContext context) {
     final border = RoundedRectangleBorder(
