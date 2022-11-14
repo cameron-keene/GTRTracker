@@ -77,6 +77,7 @@ Future<List<totalTimePerDay>> getTotalTimes() async {
 Future<List<IntervalData>> getIntervals() async {
   List<IntervalData> intervals = [];
   List<GeoActivity> activities = await getActivities();
+  intervals = getProductivityIntervals(activities);
 
   return intervals;
 }

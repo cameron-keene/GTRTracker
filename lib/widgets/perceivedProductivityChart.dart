@@ -5,7 +5,7 @@ import 'package:gtrtracker/pages/data.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphic/graphic.dart';
 import 'TimeTowardsGoalsPerDay.dart';
-import 'package:gtrtracker/functions/functions.dart''
+import 'package:gtrtracker/functions/functions.dart';
 
 class perceivedProductivityChart extends StatefulWidget {
   const perceivedProductivityChart({super.key});
