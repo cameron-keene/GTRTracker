@@ -35,10 +35,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
             child: SingleChildScrollView(
                 child: Column(children: /*const*/ <Widget>[
               //GoalTimePerDay(),
-              Container(
-                child: Text("Perceived Productivity By Length of Activity",
-                    style: TextStyle(color: Color.fromARGB(255, 43, 121, 194))),
-              ),
               perceivedProductivityChart(),
             ]))));
   }

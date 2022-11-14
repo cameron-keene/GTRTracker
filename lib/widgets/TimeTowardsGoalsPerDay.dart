@@ -4,21 +4,11 @@ import 'dart:async';
 // amplify packages we will need to use
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphic/graphic.dart';
-import 'package:gtrtracker/models/Goal.dart';
-import 'package:amplify_flutter/amplify_flutter.dart';
 import "package:gtrtracker/pages/data.dart";
-import "package:gtrtracker/models/GeoActivity.dart";
-
+import "package:gtrtracker/functions/functions.dart";
 import 'package:intl/intl.dart';
 
 final _monthDayFormat = DateFormat('MM-dd');
-
-class totalTimePerDay {
-  final DateTime time;
-  int total;
-
-  totalTimePerDay(this.time, this.total);
-}
 
 class GoalTimePerDay extends StatefulWidget {
   const GoalTimePerDay({super.key});
@@ -28,52 +18,6 @@ class GoalTimePerDay extends StatefulWidget {
 }
 
 class _GoalTimePerDayState extends State<GoalTimePerDay> {
-  Future<List<GeoActivity>> getActivities() async {
-    List<GeoActivity> activities = [];
-
-    try {
-      activities = await Amplify.DataStore.query(
-        GeoActivity.classType,
-        sortBy: [GeoActivity.ACTIVITYTIME.ascending()],
-      ); //need sorted list for chart input
-      print("numgoals: " + activities.length.toString());
-    } catch (e) {
-      print("Could not query DataStore: " + e.toString());
-    }
-
-    return activities;
-  }
-
-  List<totalTimePerDay> activityTotalPerDay(List<GeoActivity> activities) {
-    //iterates through all activities, add new days where they dont exist + total, adds to total where day exists.
-    //assumes input of an activity list ordered by activity date in ascending order
-    List<totalTimePerDay> totals = [];
-
-    // activities.forEach((element) {
-    //   if (totals.isEmpty) {
-    //     //start case
-    //     totals.add(totalTimePerDay(DateTime(element.activityTime),
-    //         element.duration)); //figuring out temporal time to date time
-    //   } else if (totals[totals.length - 1].time == element.activityTime) {
-    //     //activity on same day as previous
-    //     totals[totals.length - 1].total += element.duration;
-    //   } else {
-    //     //activity on different day as previous
-    //     totals.add(totalTimePerDay(element.activityTime, element.duration));
-    //   }
-    // });
-
-    return totals;
-  }
-
-  Future<List<totalTimePerDay>> getTotalTimes() async {
-    List<totalTimePerDay> dataPoints = [];
-    List<GeoActivity> activities = await getActivities();
-    dataPoints = activityTotalPerDay(activities);
-
-    return dataPoints;
-  }
-
   /*  
   PSEUDOCODE FOR TREND: GOAL TIME PER DAY
 

@@ -4,6 +4,8 @@ import 'package:gtrtracker/pages/data.dart';
 // amplify packages we will need to use
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphic/graphic.dart';
+import 'TimeTowardsGoalsPerDay.dart';
+import 'package:gtrtracker/functions/functions.dart''
 
 class perceivedProductivityChart extends StatefulWidget {
   const perceivedProductivityChart({super.key});
@@ -17,10 +19,10 @@ class _perceivedProductivityChartState
     extends State<perceivedProductivityChart> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<totalTimePerDay>>(
-        future: getTotalTimes(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<totalTimePerDay>> snapshot) {
+    return FutureBuilder<List<IntervalData>>(
+        future: getIntervals(),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<IntervalData>> snapshot) {
           List<Widget> children;
 
           if (snapshot.connectionState == ConnectionState.done) {
@@ -42,7 +44,7 @@ class _perceivedProductivityChartState
                         child: Align(
                             alignment: Alignment.center,
                             child: Text(
-                              'Trends',
+                              'Productivity vs Activity Start',
                               style: GoogleFonts.roboto(
                                   color: Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 25,
@@ -65,11 +67,11 @@ class _perceivedProductivityChartState
                       ),
                       'min': Variable(
                         accessor: (Map map) => map['min'] as num,
-                        scale: LinearScale(min: 0, max: 160),
+                        scale: LinearScale(min: 0, max: 100),
                       ),
                       'max': Variable(
                         accessor: (Map map) => map['max'] as num,
-                        scale: LinearScale(min: 0, max: 160),
+                        scale: LinearScale(min: 0, max: 100),
                       ),
                     },
                     elements: [
