@@ -106,7 +106,7 @@ class TimeSeriesSales {
 
 final timeSeriesSales = [
   TimeSeriesSales(DateTime(2017, 9, 19), 5),
-  TimeSeriesSales(DateTime(2017, 9, 26), 25),
+  TimeSeriesSales(DateTime(2017, 9, 21), 25),
   TimeSeriesSales(DateTime(2017, 10, 3), 100),
   TimeSeriesSales(DateTime(2017, 10, 10), 75),
 ];
