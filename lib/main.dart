@@ -466,7 +466,8 @@ class geofence {
     final item = GeoActivity(
         goalID: _goalID,
         activityTime: TemporalDateTime(_timestamp),
-        duration: _duration.toInt());
+        duration: _duration.toInt(),
+        productivity: 1.0);
     await Amplify.DataStore.save(item);
   }
 

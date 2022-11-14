@@ -95,7 +95,6 @@ class _detailScreenState extends State<detailScreen> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           ToggleButtons(
-            
             direction: vertical ? Axis.vertical : Axis.horizontal,
             onPressed: (int index) {
               setState(() {
@@ -238,12 +237,14 @@ class _detailScreenState extends State<detailScreen> {
               min: 0,
               max: 100,
               divisions: 100,
-              value: getProductivity() * 100,
-              label: (getProductivity() * 100).round().toString(),
+              value: .44 * 100, // getProductivity() * 100,
+              label: (.44 * 100)
+                  .round()
+                  .toString(), //(getProductivity() * 100).round().toString()
               onChanged: (value) async {
-                final updatedItem =
-                    widget.goal.copyWith(productivity: (value / 100));
-                await Amplify.DataStore.save(updatedItem);
+                // final updatedItem =
+                //     widget.goal.copyWith(productivity: (value / 100));
+                // await Amplify.DataStore.save(updatedItem);
               },
             )), //update with current hours towards goal
             Divider(color: Color.fromARGB(255, 255, 255, 255)),
@@ -285,7 +286,7 @@ class _detailScreenState extends State<detailScreen> {
     return percentage;
   }
 
-  double getProductivity() {
-    return widget.goal.productivity;
-  }
+  // double getProductivity() {
+  //   return widget.goal.productivity;
+  // }
 }
