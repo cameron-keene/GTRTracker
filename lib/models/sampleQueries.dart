@@ -10,8 +10,7 @@
 // 		latitude: 123.45,
 // 		longitude: 123.45,
 // 		Activities: [],
-// 		radius: 1020,
-// 		productivity: 123.45);
+// 		radius: 1020);
 // await Amplify.DataStore.save(item);
 
 // -------- Goal Update --------
@@ -23,8 +22,7 @@
 // 		latitude: 123.45,
 // 		longitude: 123.45,
 // 		Activities: [],
-// 		radius: 1020,
-// 		productivity: 123.45);
+// 		radius: 1020);
 // await Amplify.DataStore.save(updatedItem);
 
 
@@ -43,14 +41,16 @@
 // final item = GeoActivity(
 // 		goalID: "a3f4095e-39de-43d2-baf4-f8c16f0f6f4d",
 // 		activityTime: TemporalDateTime.fromString("1970-01-01T12:30:23.999Z"),
-// 		duration: 1020);
+// 		duration: 1020,
+// 		productivity: 123.45);
 // await Amplify.DataStore.save(item);
 
 // -------- GeoActivity Update --------
 // final updatedItem = item.copyWith(
 // 		goalID: "a3f4095e-39de-43d2-baf4-f8c16f0f6f4d",
 // 		activityTime: TemporalDateTime.fromString("1970-01-01T12:30:23.999Z"),
-// 		duration: 1020);
+// 		duration: 1020,
+// 		productivity: 123.45);
 // await Amplify.DataStore.save(updatedItem);
 
 // -------- GeoActivity Delete --------
