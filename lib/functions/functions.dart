@@ -59,19 +59,20 @@ List<totalTimePerDay> activityTotalPerDay(List<GeoActivity> activities) {
   //assumes input of an activity list ordered by activity date in ascending order *****
   List<totalTimePerDay> totals = [];
 
-  // activities.forEach((element) {
-  //   if (totals.isEmpty) {
-  //     //start case
-  //     totals.add(totalTimePerDay(DateTime(element.activityTime),
-  //         element.duration)); //figuring out temporal time to date time
-  //   } else if (totals[totals.length - 1].time == element.activityTime) {
-  //     //activity on same day as previous
-  //     totals[totals.length - 1].total += element.duration;
-  //   } else {
-  //     //activity on different day as previous
-  //     totals.add(totalTimePerDay(element.activityTime, element.duration));
-  //   }
-  // });
+  activities.forEach((element) {
+    if (totals.isEmpty) {
+      //start case
+      totals.add(totalTimePerDay(element.activityTime.getDateTimeInUtc(),
+          element.duration)); //figuring out temporal time to date time
+    } else if (totals[totals.length - 1].time == element.activityTime) {
+      //activity on same day as previous
+      totals[totals.length - 1].total += element.duration;
+    } else {
+      //activity on different day as previous
+      totals.add(totalTimePerDay(
+          element.activityTime.getDateTimeInUtc(), element.duration));
+    }
+  });
 
   return totals;
 }
