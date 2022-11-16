@@ -471,6 +471,13 @@ class geofence {
     await Amplify.DataStore.save(item);
   }
 
+  void testCreateActivity() {
+    String goalID = "606ea45e-487b-4a8c-a769-2f6784b3fb37";
+    DateTime timestamp = DateTime.now();
+    int duration = 2;
+    createActivity(goalID, timestamp, duration);
+  }
+
   Future<void> updateGoalDuration(String goalID, int duration) async {
     List<Goal> goalList = [];
     List<GeoActivity> activityList = [];

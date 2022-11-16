@@ -82,8 +82,10 @@ class _detailScreenState extends State<detailScreen> {
         strokeColor: Color.fromARGB(122, 43, 121, 194),
       )
     ]);
+
     // Use the Goal to create the UI.
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 27, 27, 27),
         title: Text(widget.goal.name,
@@ -144,21 +146,70 @@ class _detailScreenState extends State<detailScreen> {
                               fontSize: 25,
                               fontWeight: FontWeight.bold),
                         )))),
-
-            //progress bar
+            ElevatedButton(
+                onPressed: (() {
+                  testCreateActivity();
+                }),
+                child: Text(
+                  'Create new geoActivity',
+                  style: GoogleFonts.roboto(
+                      color: Color.fromARGB(255, 43, 121, 194),
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                )),
             Center(
-                child: Container(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-              color: Color.fromARGB(132, 56, 56, 56),
-              child: LinearProgressIndicator(
-                minHeight: 7,
-                backgroundColor: Color.fromARGB(255, 255, 255, 255),
-                valueColor: new AlwaysStoppedAnimation<Color>(
-                    Color.fromARGB(255, 43, 121, 194)),
-                value: getPercentage(widget.goal),
+              child: FutureBuilder<List<GeoActivity>>(
+                future:
+                    getGeoActivities("606ea45e-487b-4a8c-a769-2f6784b3fb37"),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<GeoActivity>> snapshot) {
+                  List<Widget> children;
+
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    try {
+                      children = <Widget>[
+                        for (GeoActivity i in snapshot.data!) ...[
+                          Card(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                ListTile(
+                                  leading: Icon(Icons.album),
+                                  title: Text(i.goalID),
+                                  subtitle: Text(
+                                      'Music by Julie Gable. Lyrics by Sidney Stein.'),
+                                )
+                              ],
+                            ),
+                          ),
+                        ]
+                      ];
+                    } catch (e) {
+                      children = [Text(e.toString())];
+                    }
+                  } else if (snapshot.hasError) {
+                    children = <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text('Error: ${snapshot.error}'),
+                      )
+                    ];
+                  } else {
+                    children = const <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text('Awaiting result... (dummy data)'),
+                      )
+                    ];
+                  }
+                  return Column(
+                    children: children,
+                  );
+                },
               ),
-            )), //update with current hours towards goal
+            )
           ],
+
           if (!showActivities) ...[
             Center(
                 child: Container(
@@ -262,18 +313,18 @@ class _detailScreenState extends State<detailScreen> {
                               fontWeight: FontWeight.bold),
                         )))),
 
-            Expanded(
-                child: Padding(
-              padding: EdgeInsets.all(7.0),
-              child: GoogleMap(
-                onMapCreated: _onMapCreated,
-                initialCameraPosition: CameraPosition(
-                  target: _center,
-                  zoom: 18,
-                ),
-                circles: circles,
-              ),
-            )),
+            // Expanded(
+            //     child: Padding(
+            //   padding: EdgeInsets.all(7.0),
+            //   child: GoogleMap(
+            //     onMapCreated: _onMapCreated,
+            //     initialCameraPosition: CameraPosition(
+            //       target: _center,
+            //       zoom: 18,
+            //     ),
+            //     circles: circles,
+            //   ),
+            // )),
           ],
         ],
       ),
@@ -284,6 +335,64 @@ class _detailScreenState extends State<detailScreen> {
     double percentage = currentGoal.currentDuration / currentGoal.goalDuration;
     // debugPrint("percentage is: " + percentage.toString());
     return percentage;
+  }
+
+  Future<void> createActivity(
+      String _goalID, DateTime _timestamp, int _duration) async {
+    final item = GeoActivity(
+        goalID: _goalID,
+        activityTime: TemporalDateTime(_timestamp),
+        duration: _duration.toInt(),
+        productivity: 1.0);
+    await Amplify.DataStore.save(item);
+  }
+
+  void testCreateActivity() async {
+    debugPrint("create activity");
+    String goalID = "606ea45e-487b-4a8c-a769-2f6784b3fb37";
+    DateTime timestamp = DateTime.now();
+    int duration = 2;
+    await createActivity(goalID, timestamp, duration);
+    await updateGoalDuration(goalID, duration);
+  }
+
+  Future<void> updateGoalDuration(String goalID, int duration) async {
+    List<Goal> goalList = [];
+    List<GeoActivity> activityList = [];
+    try {
+      // get the goal and the goal duration
+      goalList = await Amplify.DataStore.query(Goal.classType,
+          where: Goal.ID.eq(goalID));
+    } catch (e) {
+      debugPrint("error: " + e.toString());
+    }
+
+    debugPrint("first: " + goalList.first.toString());
+    final goal = goalList.first;
+    int newDuration = goal.currentDuration + duration.toInt();
+    // UPDATE GOAL WITH NEW DURATION
+    final updatedGoal = goal.copyWith(
+        name: goal.name,
+        description: goal.description,
+        goalDuration: goal.goalDuration,
+        currentDuration: newDuration,
+        latitude: goal.latitude,
+        longitude: goal.longitude,
+        Activities: goal.Activities);
+    // SAVE THE NEW GOAL
+    await Amplify.DataStore.save(updatedGoal);
+  }
+
+  Future<List<GeoActivity>> getGeoActivities(String goalID) async {
+    List<GeoActivity> activities = [];
+    try {
+      // get the goal and the goal duration
+      activities = await Amplify.DataStore.query(GeoActivity.classType,
+          where: GeoActivity.GOALID.eq(goalID));
+    } catch (e) {
+      debugPrint("error: " + e.toString());
+    }
+    return activities;
   }
 
   // double getProductivity() {
