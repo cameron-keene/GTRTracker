@@ -282,13 +282,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.4"
-  graphic:
-    dependency: "direct main"
-    description:
-      name: graphic
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
   http:
     dependency: transitive
     description:
@@ -359,20 +352,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.2"
-  path_drawing:
-    dependency: transitive
-    description:
-      name: path_drawing
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
-  path_parsing:
-    dependency: transitive
-    description:
-      name: path_parsing
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   path_provider:
     dependency: transitive
     description:
@@ -504,13 +483,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
-  snack:
-    dependency: "direct main"
-    description:
-      name: snack
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
   source_span:
     dependency: transitive
     description:
