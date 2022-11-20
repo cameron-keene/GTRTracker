@@ -93,7 +93,9 @@ class _detailScreenState extends State<detailScreen> {
                 color: Color.fromARGB(255, 43, 121, 194), fontSize: 20)),
       ),
       backgroundColor: Color.fromARGB(255, 27, 27, 27),
-      body: Column(
+      body: 
+      
+      Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           ToggleButtons(
@@ -106,7 +108,7 @@ class _detailScreenState extends State<detailScreen> {
                   if (index == 0) {
                     showActivities = false;
                   } else if (index == 1) {
-                    showActivities = true;
+                    showActivities= true;
                   }
                 }
               });
@@ -157,33 +159,44 @@ class _detailScreenState extends State<detailScreen> {
                       fontSize: 25,
                       fontWeight: FontWeight.bold),
                 )),
-            Center(
-              child: FutureBuilder<List<GeoActivity>>(
-                future:
+            Expanded(
+                flex: 2, // 20%
+                child: Center(
+                  child: FutureBuilder<List<GeoActivity>>(
+                  future:
                     getGeoActivities("606ea45e-487b-4a8c-a769-2f6784b3fb37"),
-                builder: (BuildContext context,
+                  builder: (BuildContext context,
                     AsyncSnapshot<List<GeoActivity>> snapshot) {
-                  List<Widget> children;
-
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    try {
-                      children = <Widget>[
-                        for (GeoActivity i in snapshot.data!) ...[
-                          Card(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                ListTile(
-                                  leading: Icon(Icons.album),
-                                  title: Text(i.goalID),
-                                  subtitle: Text(
-                                      'Music by Julie Gable. Lyrics by Sidney Stein.'),
-                                )
-                              ],
-                            ),
-                          ),
-                        ]
-                      ];
+                    List<Widget> children;
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      try {
+                        children = <Widget>[
+                          Expanded(
+                          flex: 2, // 20%
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.all(12),
+                            child: Column( //all cards within this column
+                            children: [
+                            for (GeoActivity i in snapshot.data!) ...[
+                              Card(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading: Icon(Icons.album),
+                                      title: Text(i.goalID),
+                                      subtitle: Text(
+                                          'Music by Julie Gable. Lyrics by Sidney Stein.'),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ]
+                          ]
+                        )    
+                      )
+                    )
+                    ];
                     } catch (e) {
                       children = [Text(e.toString())];
                     }
@@ -208,7 +221,7 @@ class _detailScreenState extends State<detailScreen> {
                 },
               ),
             )
-          ],
+          )],
 
           if (!showActivities) ...[
             Center(
@@ -313,18 +326,18 @@ class _detailScreenState extends State<detailScreen> {
                               fontWeight: FontWeight.bold),
                         )))),
 
-            // Expanded(
-            //     child: Padding(
-            //   padding: EdgeInsets.all(7.0),
-            //   child: GoogleMap(
-            //     onMapCreated: _onMapCreated,
-            //     initialCameraPosition: CameraPosition(
-            //       target: _center,
-            //       zoom: 18,
-            //     ),
-            //     circles: circles,
-            //   ),
-            // )),
+            Expanded(
+                child: Padding(
+              padding: EdgeInsets.all(7.0),
+              child: GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: _center,
+                  zoom: 18,
+                ),
+                circles: circles,
+              ),
+            )),
           ],
         ],
       ),
