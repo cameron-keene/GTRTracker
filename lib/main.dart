@@ -13,7 +13,6 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtrtracker/goalClass/Goal.dart';
-import 'package:gtrtracker/models/GeoActivity.dart';
 
 import './pages/goalPage.dart';
 
