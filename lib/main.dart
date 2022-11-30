@@ -13,7 +13,6 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtrtracker/goalClass/Goal.dart';
-import 'package:gtrtracker/models/GeoActivity.dart';
 
 import './pages/goalPage.dart';
 
@@ -466,8 +465,16 @@ class geofence {
     final item = GeoActivity(
         goalID: _goalID,
         activityTime: TemporalDateTime(_timestamp),
-        duration: _duration.toInt());
+        duration: _duration.toInt(),
+        productivity: 1.0);
     await Amplify.DataStore.save(item);
+  }
+
+  void testCreateActivity() {
+    String goalID = "606ea45e-487b-4a8c-a769-2f6784b3fb37";
+    DateTime timestamp = DateTime.now();
+    int duration = 2;
+    createActivity(goalID, timestamp, duration);
   }
 
   Future<void> updateGoalDuration(String goalID, int duration) async {

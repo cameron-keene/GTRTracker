@@ -164,14 +164,14 @@ class _AddGoalFormState extends State<AddGoalForm> {
     // create a new Goal from the form values
     // `isComplete` is also required, but should start false in a new Goal
     final newGoal = Goal(
-        name: name,
-        description: description,
-        goalDuration: int.parse(goalDuration) * 60,
-        currentDuration: 0,
-        radius: graaa.toInt(),
-        latitude: latitude,
-        longitude: longitude,
-        productivity: 1.0);
+      name: name,
+      description: description,
+      goalDuration: int.parse(goalDuration) * 60,
+      currentDuration: 0,
+      radius: graaa.toInt(),
+      latitude: latitude,
+      longitude: longitude,
+    );
 
     try {
       // to write data to DataStore, we simply pass an instance of a model to
