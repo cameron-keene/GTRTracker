@@ -69,7 +69,7 @@ class _activityDetailState extends State<activityDetail> {
                   child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        widget.activity.activityTime.toString(),
+                        getTime(widget.activity.activityTime),
                         textAlign: TextAlign.left,
                         style: GoogleFonts.roboto(
                           color: Color.fromARGB(255, 255, 255, 255),
@@ -97,7 +97,7 @@ class _activityDetailState extends State<activityDetail> {
                   child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        widget.activity.duration.toString() + " hrs" ?? "",
+                        getTimeString(widget.activity.duration),
                         textAlign: TextAlign.left,
                         style: GoogleFonts.roboto(
                           color: Color.fromARGB(255, 255, 255, 255),
@@ -153,4 +153,18 @@ class _activityDetailState extends State<activityDetail> {
 
 double getProductivity(GeoActivity currentAct) {
   return currentAct.productivity;
+}
+
+String getTimeString(int value) {
+  final int hour = value ~/ 60;
+  final int minutes = value % 60;
+  if (hour > 0) {
+    return '${hour.toString()}h ${minutes.toString()}m';
+  } else {
+    return '${minutes.toString()}m';
+  }
+}
+
+String getTime(TemporalDateTime time) {
+  return '${time.getDateTimeInUtc()}';
 }
