@@ -86,21 +86,21 @@ List<IntervalData> getProductivityIntervals(List<GeoActivity> activities) {
   print(activities.length);
 
   for (int i = 1; i < 8; i++) {
-    intervals.add(IntervalData((i * 10).toString(), -1, -1));
+    intervals.add(IntervalData((i * 60).toString(), -1, -1));
   }
 
   activities.forEach((element) {
-    if (element.duration < 10) {
+    if (element.duration < 60) {
       intervals[0] = intervalMinMaxUpdate(intervals[0], element);
-    } else if (element.duration < 20) {
+    } else if (element.duration < 120) {
       intervals[1] = intervalMinMaxUpdate(intervals[1], element);
-    } else if (element.duration < 30) {
+    } else if (element.duration < 180) {
       intervals[2] = intervalMinMaxUpdate(intervals[2], element);
-    } else if (element.duration < 40) {
+    } else if (element.duration < 240) {
       intervals[3] = intervalMinMaxUpdate(intervals[3], element);
-    } else if (element.duration < 50) {
+    } else if (element.duration < 300) {
       intervals[4] = intervalMinMaxUpdate(intervals[4], element);
-    } else if (element.duration < 60) {
+    } else if (element.duration < 360) {
       intervals[5] = intervalMinMaxUpdate(intervals[5], element);
     } else {
       intervals[6] = intervalMinMaxUpdate(intervals[6], element);
