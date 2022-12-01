@@ -21,30 +21,21 @@ class _perceivedProductivityChartState
   Widget build(BuildContext context) {
     return FutureBuilder<List<IntervalData>>(
         future: getIntervals(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<IntervalData>> snapshot) {
+        builder: (BuildContext context,
+            AsyncSnapshot<List<IntervalData>> snapshot1) {
           List<Widget> children;
 
-          if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot1.connectionState == ConnectionState.done) {
             try {
               children = <Widget>[
-                Container(
-                  child: Text(
-                    //snapshot.data![0].toString(),
-                    "Productivity vs Activity Start",
-                    style: GoogleFonts.roboto(
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
                 Center(
                     child: Container(
                         padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
                         child: Align(
                             alignment: Alignment.center,
                             child: Text(
-                              'Productivity vs Activity Start',
+                              'Productivity vs Activity Duration',
+                              textAlign: TextAlign.center,
                               style: GoogleFonts.roboto(
                                   color: Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 25,
@@ -60,24 +51,36 @@ class _perceivedProductivityChartState
                   width: 350,
                   height: 300,
                   child: Chart(
-                    data: intervalData,
+                    data: snapshot1.data!,
+                    //data: intervalData,
                     variables: {
-                      'id': Variable(
-                        accessor: (Map map) => map['id'] as String,
+                      'duration': Variable(
+                        accessor: (IntervalData datum) => datum.duration,
                       ),
                       'min': Variable(
-                        accessor: (Map map) => map['min'] as num,
+                        accessor: (IntervalData datum) => datum.min,
                         scale: LinearScale(min: 0, max: 100),
                       ),
                       'max': Variable(
-                        accessor: (Map map) => map['max'] as num,
+                        accessor: (IntervalData datum) => datum.max,
                         scale: LinearScale(min: 0, max: 100),
                       ),
+                      // 'duration': Variable(
+                      //   accessor: (Map map) => map['id'] as String,
+                      // ),
+                      // 'min': Variable(
+                      //   accessor: (Map map) => map['min'] as num,
+                      //   scale: LinearScale(min: 0, max: 160),
+                      // ),
+                      // 'max': Variable(
+                      //   accessor: (Map map) => map['max'] as num,
+                      //   scale: LinearScale(min: 0, max: 160),
+                      // ),
                     },
                     elements: [
                       IntervalElement(
-                        position:
-                            Varset('id') * (Varset('min') + Varset('max')),
+                        position: Varset('duration') *
+                            (Varset('min') + Varset('max')),
                         shape: ShapeAttr(
                             value: RectShape(
                                 borderRadius: BorderRadius.circular(2))),
@@ -98,11 +101,11 @@ class _perceivedProductivityChartState
             } catch (e) {
               children = [Text(e.toString())];
             }
-          } else if (snapshot.hasError) {
+          } else if (snapshot1.hasError) {
             children = <Widget>[
               Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: Text('Error: ${snapshot.error}'),
+                child: Text('Error: ${snapshot1.error}'),
               )
             ];
           } else {

@@ -34,7 +34,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
             padding: const EdgeInsets.all(8.0),
             child: SingleChildScrollView(
                 child: Column(children: /*const*/ <Widget>[
-              //GoalTimePerDay(),
+              GoalTimePerDay(),
               perceivedProductivityChart(),
             ]))));
   }
