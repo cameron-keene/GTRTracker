@@ -31,7 +31,7 @@ class _perceivedProductivityChartState
                 Container(
                   child: Text(
                     //snapshot.data![0].toString(),
-                    "Productivity vs Activity Start",
+                    "YUngWorlD",
                     style: GoogleFonts.roboto(
                         color: Color.fromARGB(255, 255, 255, 255),
                         fontSize: 25,
@@ -44,7 +44,7 @@ class _perceivedProductivityChartState
                         child: Align(
                             alignment: Alignment.center,
                             child: Text(
-                              'Productivity vs Activity Start',
+                              'Productivity vs Activity Duration',
                               style: GoogleFonts.roboto(
                                   color: Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 25,
@@ -60,10 +60,11 @@ class _perceivedProductivityChartState
                   width: 350,
                   height: 300,
                   child: Chart(
+                    //data: snapshot.data!
                     data: intervalData,
                     variables: {
                       'id': Variable(
-                        accessor: (Map map) => map['id'] as String,
+                        accessor: (IntervalData data) => data.duration,
                       ),
                       'min': Variable(
                         accessor: (Map map) => map['min'] as num,

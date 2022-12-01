@@ -48,23 +48,14 @@ class _GoalTimePerDayState extends State<GoalTimePerDay> {
           if (snapshot.connectionState == ConnectionState.done) {
             try {
               children = <Widget>[
-                Container(
-                  child: Text(
-                    //snapshot.data![0].toString(),
-                    "DADA",
-                    style: GoogleFonts.roboto(
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
                 Center(
                     child: Container(
                         padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
                         child: Align(
                             alignment: Alignment.center,
                             child: Text(
-                              'Trends',
+                              'Total Time Spent Towards Goals Per Day',
+                              textAlign: TextAlign.center,
                               style: GoogleFonts.roboto(
                                   color: Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 25,
@@ -81,19 +72,19 @@ class _GoalTimePerDayState extends State<GoalTimePerDay> {
                   width: 350,
                   height: 300,
                   child: Chart(
-                    //data: snapshot.data!,
-                    data: timeSeriesSales,
+                    data: snapshot.data!,
+                    //data: timeSeriesSales,
                     variables: {
-                      'time': Variable(
-                        //accessor: (totalTimePerDay datum) => datum.time,
-                        accessor: (TimeSeriesSales datum) => datum.time,
+                      'date': Variable(
+                        accessor: (totalTimePerDay datum) => datum.time,
+                        //accessor: (TimeSeriesSales datum) => datum.time,
                         scale: TimeScale(
                           formatter: (time) => _monthDayFormat.format(time),
                         ),
                       ),
-                      'sales': Variable(
-                        //accessor: (totalTimePerDay datum) => datum.total,
-                        accessor: (TimeSeriesSales datum) => datum.sales,
+                      'time spent(min)': Variable(
+                        accessor: (totalTimePerDay datum) => datum.total,
+                        //accessor: (TimeSeriesSales datum) => datum.sales,
                       ),
                     },
                     elements: [
