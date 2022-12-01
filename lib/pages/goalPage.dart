@@ -158,8 +158,8 @@ class _AddGoalFormState extends State<AddGoalForm> {
     latitude = locations.elementAt(0).latitude;
     longitude = locations.elementAt(0).longitude;
 
-    print("latitude: $latitude, longitude: $longitude");
-    print("starting geoFencing Service");
+    //print("latitude: $latitude, longitude: $longitude");
+    //print("starting geoFencing Service");
 
     // create a new Goal from the form values
     // `isComplete` is also required, but should start false in a new Goal
@@ -193,8 +193,8 @@ class _AddGoalFormState extends State<AddGoalForm> {
     latitude = locations.elementAt(0).latitude;
     longitude = locations.elementAt(0).longitude;
 
-    print("latitude: $latitude, longitude: $longitude");
-    print("starting geoFencing Service");
+    //print("latitude: $latitude, longitude: $longitude");
+    //print("starting geoFencing Service");
   }
 
   Future<void> _navigateAndDisplaySelection(BuildContext context) async {

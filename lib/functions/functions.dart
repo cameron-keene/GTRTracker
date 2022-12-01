@@ -15,7 +15,7 @@ class totalTimePerDay {
 
 class IntervalData {
   //class to define basic unit of perceived productivity graph
-  int duration;
+  String duration;
   int min;
   int max;
 
@@ -30,7 +30,7 @@ Future<List<GeoActivity>> getActivitiesOrderedByActivityTime() async {
       GeoActivity.classType,
       sortBy: [GeoActivity.ACTIVITYTIME.ascending()],
     ); //need sorted list for chart input
-    print("numgoals: " + activities.length.toString());
+    //print("numact: " + activities.length.toString());
   } catch (e) {
     print("Could not query DataStore: " + e.toString());
   }
@@ -46,7 +46,7 @@ Future<List<GeoActivity>> getActivitiesOrderedByActivityDuration() async {
       GeoActivity.classType,
       sortBy: [GeoActivity.DURATION.ascending()],
     ); //need sorted list for chart input
-    print("numgoals: " + activities.length.toString());
+    // print("numact: " + activities.length.toString());
   } catch (e) {
     print("Could not query DataStore: " + e.toString());
   }
@@ -82,81 +82,40 @@ List<IntervalData> getProductivityIntervals(List<GeoActivity> activities) {
 //and max productivities for activities with a certain length
 //assumes input of list ordered by duration ascending ****
   List<IntervalData> intervals = [];
+  print("activities length");
+  print(activities.length);
+
+  for (int i = 1; i < 8; i++) {
+    intervals.add(IntervalData((i * 10).toString(), -1, -1));
+  }
 
   activities.forEach((element) {
-    if (intervals.isEmpty) {
-      IntervalData firstListElement = IntervalData(
-          (element.duration ~/ 10 * 10),
-          element.productivity.toInt(),
-          element.productivity.toInt());
-      intervals.add(firstListElement);
-    }
-
-    if (element.duration < 10 &&
-        intervals[intervals.length - 1].duration != 10) {
-      //new bin
-      intervals.add(IntervalData((element.duration ~/ 10 * 10),
-          element.productivity.toInt(), element.productivity.toInt()));
-    } else if (element.duration < 10 &&
-        intervals[intervals.length - 1].duration == 10) {
-      //update min or max
-      intervalMinMaxUpdate(intervals[intervals.length - 1], element);
-    }
-    if (element.duration < 20 &&
-        intervals[intervals.length - 1].duration != 20) {
-      //new bin
-      intervals.add(IntervalData((element.duration ~/ 10 * 10),
-          element.productivity.toInt(), element.productivity.toInt()));
-    } else if (element.duration < 20 &&
-        intervals[intervals.length - 1].duration == 20) {
-      //update min or max
-      intervalMinMaxUpdate(intervals[intervals.length - 1], element);
-    } else if (element.duration < 30 &&
-        intervals[intervals.length - 1].duration != 30) {
-      //new bin
-      intervals.add(IntervalData((element.duration ~/ 10 * 10),
-          element.productivity.toInt(), element.productivity.toInt()));
-    } else if (element.duration < 30 &&
-        intervals[intervals.length - 1].duration == 30) {
-      //update min or max
-      intervalMinMaxUpdate(intervals[intervals.length - 1], element);
-    } else if (element.duration < 40 &&
-        intervals[intervals.length - 1].duration != 40) {
-      //new bin
-      intervals.add(IntervalData((element.duration ~/ 10 * 10),
-          element.productivity.toInt(), element.productivity.toInt()));
-    } else if (element.duration < 40 &&
-        intervals[intervals.length - 1].duration == 40) {
-      //update min or max
-      intervalMinMaxUpdate(intervals[intervals.length - 1], element);
-    } else if (element.duration < 50 &&
-        intervals[intervals.length - 1].duration != 50) {
-      //new bin
-      intervals.add(IntervalData((element.duration ~/ 10 * 10),
-          element.productivity.toInt(), element.productivity.toInt()));
-    } else if (element.duration < 50 &&
-        intervals[intervals.length - 1].duration == 50) {
-      //update min or max
-      intervalMinMaxUpdate(intervals[intervals.length - 1], element);
-    } else if (element.duration < 60 &&
-        intervals[intervals.length - 1].duration != 60) {
-      //new bin
-      intervals.add(IntervalData((element.duration ~/ 10 * 10),
-          element.productivity.toInt(), element.productivity.toInt()));
-    } else if (element.duration < 60 &&
-        intervals[intervals.length - 1].duration == 60) {
-      //update min or max
-      intervalMinMaxUpdate(intervals[intervals.length - 1], element);
-    } else if (element.duration < 70 &&
-        intervals[intervals.length - 1].duration != 70) {
-      //new bin
-      intervals.add(IntervalData((element.duration ~/ 10 * 10),
-          element.productivity.toInt(), element.productivity.toInt()));
+    if (element.duration < 10) {
+      intervals[0] = intervalMinMaxUpdate(intervals[0], element);
+    } else if (element.duration < 20) {
+      intervals[1] = intervalMinMaxUpdate(intervals[1], element);
+    } else if (element.duration < 30) {
+      intervals[2] = intervalMinMaxUpdate(intervals[2], element);
+    } else if (element.duration < 40) {
+      intervals[3] = intervalMinMaxUpdate(intervals[3], element);
+    } else if (element.duration < 50) {
+      intervals[4] = intervalMinMaxUpdate(intervals[4], element);
+    } else if (element.duration < 60) {
+      intervals[5] = intervalMinMaxUpdate(intervals[5], element);
     } else {
-      //update min or max
-      intervalMinMaxUpdate(intervals[intervals.length - 1], element);
+      intervals[6] = intervalMinMaxUpdate(intervals[6], element);
     }
   });
+
+  print(intervals.length);
+
+  for (int i = 0; i < intervals.length; i++) {
+    String one = (intervals[i].duration);
+    int two = intervals[i].min;
+    int three = intervals[i].max;
+
+    print("$one, $two, $three");
+  }
 
 //pseudocode
 /* 
@@ -172,8 +131,12 @@ setup bins - case statement for range (10 mins)
 
 IntervalData intervalMinMaxUpdate(IntervalData previous, GeoActivity act) {
   //updates interval productivity
-  int maxi = max(previous.max, act.productivity.toInt());
-  int mini = min(previous.min, act.productivity.toInt());
+  int maxi = max(previous.max, ((act.productivity) * 100).toInt());
+  int mini = min(previous.min, ((act.productivity) * 100).toInt());
+
+  if (previous.min == -1) {
+    mini = ((act.productivity) * 100).toInt();
+  }
 
   return IntervalData(previous.duration, mini, maxi);
 }

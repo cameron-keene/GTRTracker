@@ -35,7 +35,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
             child: SingleChildScrollView(
                 child: Column(children: /*const*/ <Widget>[
               GoalTimePerDay(),
-              //perceivedProductivityChart(),
+              perceivedProductivityChart(),
             ]))));
   }
 }
